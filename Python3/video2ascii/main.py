@@ -24,10 +24,10 @@ def main():
             frame_pixels.shape[0] * font_size[1] / font_size[0]
         x = curses.COLS
         y = curses.LINES
-        if (x > y):  # maintain aspect ratio
+        if (x / y > ratio):  # maintain aspect ratio
             x = int(y * ratio)
         else:
-            y = int(x * ratio)
+            y = int(x / ratio)
         block_x = frame_pixels.shape[1] // x
         block_y = frame_pixels.shape[0] // y
 
@@ -41,7 +41,6 @@ def main():
 
         char_zip.sort(key=lambda t: t[0])
         chars_sorted = list(map(lambda t: t[1], char_zip))
-
         for i in range(x - 1):
             for j in range(y - 1):
                 chunk = frame_pixels[j *
