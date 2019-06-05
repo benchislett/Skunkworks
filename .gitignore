@@ -111,3 +111,9 @@ venv.bak/
 
 # videos
 *.mp4
+
+# vscode settings
+.vscode/
+
+# compiled code
+*.out
