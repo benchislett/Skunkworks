@@ -1,10 +1,14 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <cmath>
 
-constexpr int width = 200;
-constexpr int height = 200;
-constexpr int rows = 20;
-constexpr int cols = 20;
+int width = 1000;
+int height = 600;
+constexpr int rows = 60;
+constexpr int cols = 100;
+
+int cell_width = width / cols;
+int cell_height = height / rows;
 
 bool cells_a[cols][rows];
 bool cells_b[cols][rows];
@@ -12,6 +16,9 @@ bool cells_b[cols][rows];
 int timestep;
 
 sf::RenderWindow window(sf::VideoMode(width, height), "SFML");
+
+sf::RectangleShape dead;
+sf::RectangleShape alive;
 
 bool within_bounds(int x, int y)
 {
@@ -45,12 +52,26 @@ void reset()
       cells_b[i][j] = false;
     }
   }
+
+  dead.setSize(sf::Vector2f(cell_width, cell_height));
+  dead.setOutlineColor(sf::Color::Black);
+  dead.setOutlineThickness(1);
+  dead.setPosition(0, 0);
+
+  alive.setSize(sf::Vector2f(cell_width, cell_height));
+  alive.setOutlineColor(sf::Color::Black);
+  alive.setOutlineThickness(1);
+  alive.setPosition(0, 0);
+
+  dead.setFillColor(sf::Color::White);
+  alive.setFillColor(sf::Color::Black);
 }
 
 void step()
 {
-  bool(*cells)[20] = (++timestep % 2) ? cells_a : cells_b;
-  bool(*other)[20] = (timestep % 2) ? cells_a : cells_b;
+  bool(*cells)[rows] = (timestep % 2) ? cells_a : cells_b;
+  timestep++;
+  bool(*other)[rows] = (timestep % 2) ? cells_a : cells_b;
 
   int sides[8][2] = {
       {-1, -1},
@@ -81,9 +102,77 @@ void step()
   }
 }
 
+void draw()
+{
+  window.clear();
+
+  bool(*cells)[rows] = (timestep % 2) ? cells_a : cells_b;
+
+  for (int i = 0; i < cols; i++)
+  {
+    for (int j = 0; j < rows; j++)
+    {
+      sf::RectangleShape block = cells[i][j] ? alive : dead;
+      block.setPosition(i * cell_width, j * cell_height);
+      window.draw(block);
+    }
+  }
+
+  window.display();
+}
+
 int main()
 {
   reset();
-  window.close();
+  while (window.isOpen())
+  {
+    sf::Vector2u size = window.getSize();
+    width = size.x;
+    height = size.y;
+
+    draw();
+
+    sf::Event event;
+    while (window.pollEvent(event))
+    {
+      if (event.type == sf::Event::Closed)
+      {
+        window.capture().saveToFile("output.png");
+        window.close();
+
+        return 0;
+      }
+      else if (event.type == sf::Event::MouseButtonPressed)
+      {
+        sf::Vector2i MousePos = sf::Mouse::getPosition(window);
+
+        int x = MousePos.x;
+        int y = MousePos.y;
+        if (0 < x && x < width && 0 < y && y < height)
+        {
+          int col = floor(x / (float)width * cols);
+          int row = floor(y / (float)height * rows);
+          (timestep % 2 ? cells_a : cells_b)[col][row] = !(timestep % 2 ? cells_a : cells_b)[col][row];
+        }
+      }
+      else if (event.type == sf::Event::KeyPressed)
+      {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+        {
+          step();
+        }
+      }
+    }
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+    {
+      step();
+    }
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+    {
+      window.close();
+    }
+  }
   return 0;
 }

@@ -117,3 +117,6 @@ venv.bak/
 
 # compiled code
 *.out
+
+# saved screenshots
+output.*
