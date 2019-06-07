@@ -137,7 +137,7 @@ int main()
     {
       if (event.type == sf::Event::Closed)
       {
-        window.capture().saveToFile("output.png");
+        window.capture().saveToFile("output/output.png");
         window.close();
 
         return 0;
@@ -152,7 +152,7 @@ int main()
         {
           int col = floor(x / (float)width * cols);
           int row = floor(y / (float)height * rows);
-          (timestep % 2 ? cells_a : cells_b)[col][row] = !(timestep % 2 ? cells_a : cells_b)[col][row];
+          ((timestep % 2) ? cells_a : cells_b)[col][row] = !((timestep % 2) ? cells_a : cells_b)[col][row];
         }
       }
       else if (event.type == sf::Event::KeyPressed)
@@ -167,11 +167,6 @@ int main()
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
     {
       step();
-    }
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
-    {
-      window.close();
     }
   }
   return 0;

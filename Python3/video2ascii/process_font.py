@@ -6,7 +6,7 @@ FONT_SIZE = 16
 FONT_COLOUR = (255, 255, 255)
 BACKGROUND_COLOUR = (48, 10, 36)
 # CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%?&*()/\.";:,^'
-CHARS = " .,:-=+*#%@"
+CHARS = " .:-=+/#%@"
 
 font = ImageFont.truetype(font=FONT_FILE, size=FONT_SIZE)
 font_size = font.getsize('A')  # monospace font

@@ -12,6 +12,8 @@ VIDEO_FILE = './test.mp4'
 stdscr = curses.initscr()  # initialize the screen
 curses.noecho()  # hide user key input
 
+latest_scr = []
+
 
 def main():
     vid = cv2.VideoCapture(VIDEO_FILE)
@@ -41,6 +43,7 @@ def main():
 
         char_zip.sort(key=lambda t: t[0])
         chars_sorted = list(map(lambda t: t[1], char_zip))
+        tmp = ['' for i in range(y - 1)]
         for i in range(x - 1):
             for j in range(y - 1):
                 chunk = frame_pixels[j *
@@ -48,6 +51,9 @@ def main():
                 char = chars_sorted[int(
                     np.mean(chunk) / 255. * (len(CHARS) - 1))]
                 stdscr.addstr(j, i, char)
+                tmp[j] += char
+        global latest_scr
+        latest_scr = tmp
         stdscr.refresh()
 
 
@@ -55,6 +61,9 @@ def main():
 def teardown():
     curses.echo()
     curses.endwin()
+
+    with open('output/output.txt', "w") as f:
+        f.write('\n'.join(latest_scr))
 
 
 # execute
