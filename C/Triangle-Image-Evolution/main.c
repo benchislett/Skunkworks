@@ -1,3 +1,5 @@
+#define _POSIX_C_SOURCE 200809L
+
 #include <cairo.h>
 #include <time.h>
 #include <stdio.h>
@@ -16,6 +18,9 @@ cairo_surface_t *target;
 
 cairo_surface_t *surface;
 cairo_t *cr;
+
+struct timespec start;
+struct timespec end;
 
 void new_triangle(int i)
 {
@@ -93,6 +98,7 @@ double get_fitness()
 
 void step()
 {
+
   unsigned int tmp;
 
   int idx = timestep % num_triangles;
@@ -111,9 +117,9 @@ void step()
   int mutate_color = rand() % 2;
   if (mutate_color)
   {
-    triangles[idx][6] = (rand() % 16) * 16;
-    triangles[idx][7] = (rand() % 16) * 16;
-    triangles[idx][8] = (rand() % 16) * 16;
+    triangles[idx][6] = rand() % 256;
+    triangles[idx][7] = rand() % 256;
+    triangles[idx][8] = rand() % 256;
   }
   else
   {
@@ -121,7 +127,6 @@ void step()
     triangles[idx][2 * vertex] = rand() % width;
     triangles[idx][2 * vertex + 1] = rand() % height;
   }
-
   draw();
   double new_fitness = get_fitness();
 
@@ -144,6 +149,11 @@ void step()
   }
 }
 
+long time_diff(struct timespec a, struct timespec b)
+{
+  return (b.tv_nsec - a.tv_nsec < 0 ? 1000000000 : 0) + (b.tv_nsec - a.tv_nsec);
+}
+
 void teardown()
 {
   cairo_destroy(cr);
@@ -156,11 +166,13 @@ int main()
 {
   setup();
 
-  for (int i = 0; i < 1000000; i++)
+  for (int i = 0; i < 10000000; i++)
   {
     if (i % 100 == 0)
     {
-      printf("Iterations: %d, Improvements: %ld, Fitness: %f\n", i, timestep, fitness);
+      clock_gettime(CLOCK_REALTIME, &end);
+      printf("Iterations: %d, Improvements: %ld, Fitness: %f, Iterations/second: %ld\n", i, timestep, fitness, (long)(1000000000.0 * 100.0 / time_diff(start, end)));
+      clock_gettime(CLOCK_REALTIME, &start);
     }
     step();
   }
