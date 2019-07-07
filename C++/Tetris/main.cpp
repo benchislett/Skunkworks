@@ -1,5 +1,8 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <fstream>
+#include <cmath>
+#include <ctime>
 
 constexpr uint block_size = 16;
 constexpr uint rows = 22;
@@ -13,11 +16,16 @@ unsigned long long frame = 1;
 const unsigned int framerate = 60;
 
 uint level = 0;
+uint lines = 0;
+
+uint score = 0;
+uint high_score = 0;
 
 int horizontalRepeat = 0;
 bool horizontalLast = false;
 
 bool resetDrop = false;
+int dropPoints = 0;
 
 typedef struct Point
 {
@@ -81,10 +89,17 @@ sf::Sprite background;
 sf::Texture block_textures;
 sf::Sprite block_sprite;
 
+sf::Font font;
+sf::Text line_text;
+sf::Text level_text;
+sf::Text score_text;
+sf::Text high_score_text;
+
 sf::Event e;
 
 void setup()
 {
+  srand(time(NULL));
   for (int i = 0; i < cols; i++)
   {
     for (int k = 0; k < rows; k++)
@@ -98,20 +113,79 @@ void setup()
 
   next.type = (rand() % 7) + 1;
 
+  std::ifstream high_score_file("data/highscore.cfg", std::ios::in);
+
+  high_score_file >> high_score;
+
+  high_score_file.close();
+
   background_texture.loadFromFile("data/background.png");
   background.setTexture(background_texture);
 
   block_textures.loadFromFile("data/NES_tiles.png");
   block_sprite.setTexture(block_textures);
 
+  font.loadFromFile("./data/font.ttf");
+
+  line_text.setFont(font);
+  level_text.setFont(font);
+  score_text.setFont(font);
+  high_score_text.setFont(font);
+
+  line_text.setCharacterSize(16);
+  level_text.setCharacterSize(16);
+  score_text.setCharacterSize(16);
+  high_score_text.setCharacterSize(16);
+
+  line_text.setPosition(304, 46);
+  level_text.setPosition(420, 338);
+  score_text.setPosition(384, 126);
+  high_score_text.setPosition(384, 78);
+
   window.setFramerateLimit(framerate);
   window.setKeyRepeatEnabled(false);
+}
+
+void update_high_score()
+{
+  std::ofstream high_score_file("data/highscore.cfg", std::ios::out);
+
+  high_score = score;
+  high_score_file << high_score;
+
+  high_score_file.close();
+}
+
+std::string zpad(uint val, uint size)
+{
+  std::string s = std::to_string(val);
+  s.insert(0, size - s.size(), '0');
+  return s;
+}
+
+void update_text()
+{
+  line_text.setString(zpad(lines, 3));
+  level_text.setString(zpad(level, 2));
+  score_text.setString(zpad(score, 6));
+  high_score_text.setString(zpad(high_score, 6));
+}
+
+void draw_text()
+{
+  update_text();
+  window.draw(line_text);
+  window.draw(level_text);
+  window.draw(score_text);
+  window.draw(high_score_text);
 }
 
 void draw_background()
 {
   window.clear(sf::Color::Blue);
   window.draw(background);
+
+  draw_text();
 }
 
 void draw_tile(ushort type, Point coords)
@@ -119,7 +193,7 @@ void draw_tile(ushort type, Point coords)
   if (type && coords.y > 1)
   {
     // sf::IntRect(int x, int y, int width, int height)
-    block_sprite.setTextureRect(sf::IntRect((type - 1) * block_size, 0, block_size, block_size));
+    block_sprite.setTextureRect(sf::IntRect((type - 1) * block_size, (level % 10) * block_size, block_size, block_size));
     block_sprite.setPosition(field_x + coords.x * block_size, field_y + coords.y * block_size);
 
     window.draw(block_sprite);
@@ -183,12 +257,78 @@ bool conflict()
 
 int game_over()
 {
-  std::cout << "Game over!" << std::endl;
+  if (score > high_score)
+  {
+    update_high_score();
+  }
 
   window.capture().saveToFile("output.png");
   window.close();
 
   return 0;
+}
+
+void update_score(int cleared)
+{
+  lines += cleared;
+  level = lines / 10;
+
+  score += (cleared == 0 ? 0 : cleared == 1 ? 40 : cleared == 2 ? 100 : cleared == 3 ? 300 : 1200) * (level + 1);
+  score += dropPoints;
+  dropPoints = 0;
+}
+
+void check_clear_lines()
+{
+  std::vector<ushort> to_clear;
+  int i, j;
+  for (i = 2; i < rows; i++)
+  {
+    bool line_full = true;
+    for (j = 0; j < cols; j++)
+    {
+      if (field[j][i] == 0)
+      {
+        line_full = false;
+        break;
+      }
+    }
+    if (line_full)
+    {
+      to_clear.push_back(i);
+    }
+  }
+
+  for (int i = 0; i < cols / 2; i++)
+  {
+    for (ushort row : to_clear)
+    {
+      field[cols / 2 + i][row] = 0;
+      field[cols / 2 - i - 1][row] = 0;
+    }
+
+    draw_background();
+
+    draw_field();
+
+    for (int j = 0; j < 4; j++)
+    {
+      window.display();
+    }
+  }
+
+  for (ushort row : to_clear)
+  {
+    for (int i = row; i > 2; i--)
+    {
+      for (int j = 0; j < cols; j++)
+      {
+        field[j][i] = field[j][i - 1];
+      }
+    }
+  }
+
+  update_score(to_clear.size());
 }
 
 void place()
@@ -198,6 +338,7 @@ void place()
     field[get_current_x(i)][get_current_y(i)] = current.type;
   }
   resetDrop = true;
+  check_clear_lines();
 }
 
 void new_piece()
@@ -250,7 +391,7 @@ void shift()
   }
 }
 
-void rotateCW()
+void rotate_cw()
 {
   current.rotation = (current.rotation + 1) % 4;
   if (conflict())
@@ -259,7 +400,7 @@ void rotateCW()
   }
 }
 
-void rotateCCW()
+void rotate_ccw()
 {
   current.rotation = (current.rotation + 3) % 4;
   if (conflict())
@@ -336,6 +477,7 @@ int main()
 
     if (conflict())
     {
+      std::cout << "Game over!" << std::endl;
       game_over();
     }
 
@@ -394,10 +536,10 @@ int main()
         switch (e.key.code)
         {
         case sf::Keyboard::Z:
-          rotateCW();
+          rotate_cw();
           break;
         case sf::Keyboard::X:
-          rotateCCW();
+          rotate_ccw();
           break;
         case sf::Keyboard::Down:
           resetDrop = false;
