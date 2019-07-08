@@ -197,7 +197,7 @@ void draw_tile(ushort type, Point coords)
   if (type && coords.y > 1)
   {
     // sf::IntRect(int x, int y, int width, int height)
-    block_sprite.setTextureRect(sf::IntRect((type - 1) * block_size, (level % 10) * block_size, block_size, block_size));
+    block_sprite.setTextureRect(sf::IntRect(((type - 1) % 3) * block_size, (level % 10) * block_size, block_size, block_size));
     block_sprite.setPosition(field_x + coords.x * block_size, field_y + coords.y * block_size);
 
     window.draw(block_sprite);
@@ -244,7 +244,7 @@ void draw_next()
       x += block_size / 2;
     }
 
-    block_sprite.setTextureRect(sf::IntRect((next.type - 1) * block_size, (level % 10) * block_size, block_size, block_size));
+    block_sprite.setTextureRect(sf::IntRect(((next.type - 1) % 3) * block_size, (level % 10) * block_size, block_size, block_size));
     block_sprite.setPosition(x, y);
 
     window.draw(block_sprite);
