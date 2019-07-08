@@ -9,8 +9,12 @@ constexpr uint rows = 22;
 constexpr uint cols = 10;
 constexpr uint width = 512;
 constexpr uint height = 480;
+
 constexpr uint field_x = 191;
 constexpr uint field_y = 63;
+
+constexpr uint next_x = 376;
+constexpr uint next_y = 208;
 
 unsigned long long frame = 1;
 const unsigned int framerate = 60;
@@ -228,6 +232,25 @@ void draw_current()
   }
 }
 
+void draw_next()
+{
+  for (short i = 0; i < 4; i++)
+  {
+    int x = next_x + blocks[next.type - 1][0][i].x * block_size;
+    int y = next_y + blocks[next.type - 1][0][i].y * block_size;
+
+    if (next.type == 1 || next.type == 7)
+    {
+      x += block_size / 2;
+    }
+
+    block_sprite.setTextureRect(sf::IntRect((next.type - 1) * block_size, (level % 10) * block_size, block_size, block_size));
+    block_sprite.setPosition(x, y);
+
+    window.draw(block_sprite);
+  }
+}
+
 bool conflict()
 {
   for (int i = 0; i < 4; i++)
@@ -310,6 +333,8 @@ void check_clear_lines()
     draw_background();
 
     draw_field();
+
+    draw_next();
 
     for (int j = 0; j < 4; j++)
     {
@@ -474,6 +499,8 @@ int main()
     draw_field();
 
     draw_current();
+
+    draw_next();
 
     if (conflict())
     {
