@@ -285,7 +285,7 @@ int game_over()
     update_high_score();
   }
 
-  window.capture().saveToFile("output.png");
+  window.capture().saveToFile("output/output.png");
   window.close();
 
   return 0;
