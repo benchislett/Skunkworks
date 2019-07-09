@@ -16,6 +16,10 @@ constexpr uint field_y = 63;
 constexpr uint next_x = 376;
 constexpr uint next_y = 208;
 
+constexpr uint mini_block_size = 12;
+constexpr uint stats_x = 48;
+constexpr uint stats_y = 160;
+
 unsigned long long frame = 1;
 const unsigned int framerate = 60;
 
@@ -31,6 +35,9 @@ bool horizontalLast = false;
 bool resetDrop = false;
 int dropPoints = 0;
 
+uint stats_count[7];
+const uint mini_block_offset[7] = {0, 30, 64, 96, 128, 158, 198};
+
 typedef struct Point
 {
   short x;
@@ -44,34 +51,34 @@ typedef struct Point
  * This grid initially spans the square with corners coordinates (3, -2) through (6, 1) inclusive when the piece spawns 
  */
 const Point blocks[7][4][4] = {
-    {{{0, 2}, {1, 2}, {2, 2}, {3, 2}}, // I Piece
-     {{2, 0}, {2, 1}, {2, 2}, {2, 3}},
-     {{0, 2}, {1, 2}, {2, 2}, {3, 2}},
-     {{2, 0}, {2, 1}, {2, 2}, {2, 3}}},
-    {{{1, 2}, {2, 2}, {2, 3}, {3, 3}}, // Z Piece
-     {{2, 3}, {2, 2}, {3, 2}, {3, 1}},
-     {{1, 2}, {2, 2}, {2, 3}, {3, 3}},
-     {{2, 3}, {2, 2}, {3, 2}, {3, 1}}},
-    {{{1, 3}, {2, 3}, {2, 2}, {3, 2}}, // S Piece
-     {{2, 1}, {2, 2}, {3, 2}, {3, 3}},
-     {{1, 3}, {2, 3}, {2, 2}, {3, 2}},
-     {{2, 1}, {2, 2}, {3, 2}, {3, 3}}},
     {{{1, 2}, {2, 2}, {2, 3}, {3, 2}}, // T Piece
      {{2, 1}, {2, 2}, {2, 3}, {3, 2}},
      {{1, 2}, {2, 2}, {2, 1}, {3, 2}},
      {{1, 2}, {2, 2}, {2, 3}, {2, 1}}},
-    {{{1, 3}, {1, 2}, {2, 2}, {3, 2}}, // L Piece
-     {{2, 1}, {2, 2}, {2, 3}, {3, 3}},
-     {{1, 2}, {2, 2}, {3, 2}, {3, 1}},
-     {{1, 1}, {2, 1}, {2, 2}, {2, 3}}},
     {{{1, 2}, {2, 2}, {3, 2}, {3, 3}}, // J Piece
      {{2, 3}, {2, 2}, {2, 1}, {3, 1}},
      {{1, 1}, {1, 2}, {2, 2}, {3, 2}},
      {{1, 3}, {2, 3}, {2, 2}, {2, 1}}},
+    {{{1, 2}, {2, 2}, {2, 3}, {3, 3}}, // Z Piece
+     {{2, 3}, {2, 2}, {3, 2}, {3, 1}},
+     {{1, 2}, {2, 2}, {2, 3}, {3, 3}},
+     {{2, 3}, {2, 2}, {3, 2}, {3, 1}}},
     {{{1, 3}, {1, 2}, {2, 2}, {2, 3}}, // O Piece
      {{1, 3}, {1, 2}, {2, 2}, {2, 3}},
      {{1, 3}, {1, 2}, {2, 2}, {2, 3}},
-     {{1, 3}, {1, 2}, {2, 2}, {2, 3}}}};
+     {{1, 3}, {1, 2}, {2, 2}, {2, 3}}},
+    {{{1, 3}, {2, 3}, {2, 2}, {3, 2}}, // S Piece
+     {{2, 1}, {2, 2}, {3, 2}, {3, 3}},
+     {{1, 3}, {2, 3}, {2, 2}, {3, 2}},
+     {{2, 1}, {2, 2}, {3, 2}, {3, 3}}},
+    {{{1, 3}, {1, 2}, {2, 2}, {3, 2}}, // L Piece
+     {{2, 1}, {2, 2}, {2, 3}, {3, 3}},
+     {{1, 2}, {2, 2}, {3, 2}, {3, 1}},
+     {{1, 1}, {2, 1}, {2, 2}, {2, 3}}},
+    {{{0, 2}, {1, 2}, {2, 2}, {3, 2}}, // I Piece
+     {{2, 0}, {2, 1}, {2, 2}, {2, 3}},
+     {{0, 2}, {1, 2}, {2, 2}, {3, 2}},
+     {{2, 0}, {2, 1}, {2, 2}, {2, 3}}}};
 
 typedef struct Piece
 {
@@ -98,6 +105,7 @@ sf::Text line_text;
 sf::Text level_text;
 sf::Text score_text;
 sf::Text high_score_text;
+sf::Text stats_text[7];
 
 sf::Event e;
 
@@ -146,6 +154,15 @@ void setup()
   score_text.setPosition(384, 126);
   high_score_text.setPosition(384, 78);
 
+  for (int i = 0; i < 7; i++)
+  {
+    stats_count[i] = 0;
+    stats_text[i].setFont(font);
+    stats_text[i].setCharacterSize(16);
+    stats_text[i].setPosition(stats_x + 4.5 * mini_block_size, stats_y + (2.6 * i + 2.5) * mini_block_size);
+    stats_text[i].setFillColor(sf::Color::Red);
+  }
+
   window.setFramerateLimit(framerate);
   window.setKeyRepeatEnabled(false);
 }
@@ -173,6 +190,11 @@ void update_text()
   level_text.setString(zpad(level, 2));
   score_text.setString(zpad(score, 6));
   high_score_text.setString(zpad(high_score, 6));
+
+  for (int i = 0; i < 7; i++)
+  {
+    stats_text[i].setString(zpad(stats_count[i], 3));
+  }
 }
 
 void draw_text()
@@ -182,14 +204,16 @@ void draw_text()
   window.draw(level_text);
   window.draw(score_text);
   window.draw(high_score_text);
+  for (int i = 0; i < 7; i++)
+  {
+    window.draw(stats_text[i]);
+  }
 }
 
 void draw_background()
 {
   window.clear(sf::Color::Blue);
   window.draw(background);
-
-  draw_text();
 }
 
 void draw_tile(ushort type, Point coords)
@@ -239,7 +263,7 @@ void draw_next()
     int x = next_x + blocks[next.type - 1][0][i].x * block_size;
     int y = next_y + blocks[next.type - 1][0][i].y * block_size;
 
-    if (next.type == 1 || next.type == 7)
+    if (next.type == 4 || next.type == 7)
     {
       x += block_size / 2;
     }
@@ -248,6 +272,28 @@ void draw_next()
     block_sprite.setPosition(x, y);
 
     window.draw(block_sprite);
+  }
+}
+
+void draw_stats_pieces()
+{
+  for (short i = 0; i < 7; i++)
+  {
+    for (short j = 0; j < 4; j++)
+    {
+      int x = stats_x + blocks[i][0][j].x * mini_block_size;
+      int y = stats_y + blocks[i][0][j].y * mini_block_size + mini_block_offset[i];
+
+      if (i == 3 || i == 6)
+      {
+        x += mini_block_size / 2;
+      }
+
+      block_sprite.setTextureRect(sf::IntRect((i % 3) * mini_block_size + 4 * block_size, (level % 10) * mini_block_size, mini_block_size, mini_block_size));
+      block_sprite.setPosition(x, y);
+
+      window.draw(block_sprite);
+    }
   }
 }
 
@@ -336,6 +382,10 @@ void check_clear_lines()
 
     draw_next();
 
+    draw_stats_pieces();
+
+    draw_text();
+
     for (int j = 0; j < 4; j++)
     {
       window.display();
@@ -358,6 +408,7 @@ void check_clear_lines()
 
 void place()
 {
+  stats_count[current.type - 1]++;
   for (int i = 0; i < 4; i++)
   {
     field[get_current_x(i)][get_current_y(i)] = current.type;
@@ -501,6 +552,10 @@ int main()
     draw_current();
 
     draw_next();
+
+    draw_stats_pieces();
+
+    draw_text();
 
     if (conflict())
     {
