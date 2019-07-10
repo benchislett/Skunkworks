@@ -573,6 +573,11 @@ int main()
       {
         if (frame % 2)
         {
+          // Mimic a bug in classic tetris that limits and resets dropPoints
+          if (++dropPoints > 15)
+          {
+            dropPoints = 10;
+          }
           fall();
         }
       }
@@ -625,6 +630,17 @@ int main()
           break;
         case sf::Keyboard::Down:
           resetDrop = false;
+          dropPoints = 0;
+          break;
+        }
+      }
+
+      if (e.type == sf::Event::KeyReleased)
+      {
+        switch (e.key.code)
+        {
+        case sf::Keyboard::Down:
+          dropPoints = 0;
           break;
         }
       }
