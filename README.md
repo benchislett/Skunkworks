@@ -7,6 +7,8 @@ Miscellaneous programming exercises and projects, sorted by language
 - C++
   - [Conway's Game of Life implementation](C++/Game-of-Life/README.md) (`SFML`)
   - [NES Tetris](C++/Tetris/README.md) (`SFML`)
+- Julia
+- - [OIST Skill-Pill Notes](Julia/Skill-Pill/README.md)
 - Python
   - [Split-Step Fourier Method NLSE solver](Python3/Split-Operator-Solver/README.md)
   - [Video to Ascii converter](Python3/video2ascii/README.md) (`curses`)
