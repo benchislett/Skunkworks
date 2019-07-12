@@ -1,0 +1,11 @@
+Buenos Aires, Argentina: population 11862073.0
+Sao Paulo, Brazil: population 14433147.5
+Shanghai, China: population 14797756.0
+Delhi, India: population 11779606.5
+Mumbai, India: population 15834918.0
+Tokyo, Japan: population 22006299.5
+Mexico City, Mexico: population 14919501.0
+Karachi, Pakistan: population 11877109.5
+Moscow, Russia: population 10452000.0
+Istanbul, Turkey: population 10003305.0
+New York, United States of America: population 13524139.0
