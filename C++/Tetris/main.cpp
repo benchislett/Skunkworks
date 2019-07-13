@@ -23,17 +23,17 @@ constexpr uint stats_y = 160;
 unsigned long long frame = 1;
 const unsigned int framerate = 60;
 
-uint level = 0;
-uint lines = 0;
+uint level;
+uint lines;
 
-uint score = 0;
-uint high_score = 0;
+uint score;
+uint high_score;
 
-int horizontalRepeat = 0;
-bool horizontalLast = false;
+int horizontalRepeat;
+bool horizontalLast;
 
-bool resetDrop = false;
-int dropPoints = 0;
+bool resetDrop;
+int dropPoints;
 
 uint stats_count[7];
 const uint mini_block_offset[7] = {0, 30, 64, 96, 128, 158, 198};
@@ -109,9 +109,8 @@ sf::Text stats_text[7];
 
 sf::Event e;
 
-void setup()
+void reset()
 {
-  srand(time(NULL));
   for (int i = 0; i < cols; i++)
   {
     for (int k = 0; k < rows; k++)
@@ -124,6 +123,29 @@ void setup()
   current.type = (rand() % 7) + 1;
 
   next.type = (rand() % 7) + 1;
+
+  level = 0;
+  lines = 0;
+
+  score = 0;
+
+  horizontalRepeat = 0;
+  horizontalLast = false;
+
+  resetDrop = false;
+  dropPoints = 0;
+
+  for (int i = 0; i < 7; i++)
+  {
+    stats_count[i] = 0;
+  }
+}
+
+void setup()
+{
+  srand(time(NULL));
+
+  reset();
 
   std::ifstream high_score_file("data/highscore.cfg", std::ios::in);
 
@@ -156,7 +178,6 @@ void setup()
 
   for (int i = 0; i < 7; i++)
   {
-    stats_count[i] = 0;
     stats_text[i].setFont(font);
     stats_text[i].setCharacterSize(16);
     stats_text[i].setPosition(stats_x + 4.5 * mini_block_size, stats_y + (2.6 * i + 2.5) * mini_block_size);
@@ -165,6 +186,19 @@ void setup()
 
   window.setFramerateLimit(framerate);
   window.setKeyRepeatEnabled(false);
+}
+
+void advance_frame()
+{
+  window.display();
+}
+
+void advance_frames(int n)
+{
+  for (int i = 0; i < n; i++)
+  {
+    advance_frame();
+  }
 }
 
 void update_high_score()
@@ -297,6 +331,22 @@ void draw_stats_pieces()
   }
 }
 
+void draw_shutters()
+{
+  block_sprite.setTextureRect(sf::IntRect(3 * block_size, (level % 10) * block_size, block_size, block_size));
+  for (int i = 2; i < rows; i++)
+  {
+    for (int j = 0; j < cols; j++)
+    {
+      int x = field_x + j * block_size;
+      int y = field_y + i * block_size;
+      block_sprite.setPosition(x, y);
+      window.draw(block_sprite);
+    }
+    advance_frames(4);
+  }
+}
+
 bool conflict()
 {
   for (int i = 0; i < 4; i++)
@@ -326,15 +376,22 @@ bool conflict()
 
 int game_over()
 {
+  draw_shutters();
+
   if (score > high_score)
   {
     update_high_score();
   }
 
+  reset();
+
+  advance_frames(60);
+}
+
+void teardown()
+{
   window.capture().saveToFile("output/output.png");
   window.close();
-
-  return 0;
 }
 
 void update_score(int cleared)
@@ -386,10 +443,7 @@ void check_clear_lines()
 
     draw_text();
 
-    for (int j = 0; j < 4; j++)
-    {
-      window.display();
-    }
+    advance_frames(4);
   }
 
   for (ushort row : to_clear)
@@ -559,7 +613,6 @@ int main()
 
     if (conflict())
     {
-      std::cout << "Game over!" << std::endl;
       game_over();
     }
 
@@ -609,13 +662,14 @@ int main()
       }
     }
 
-    window.display();
+    advance_frame();
 
     while (window.pollEvent(e))
     {
       if (e.type == sf::Event::Closed)
       {
-        game_over();
+        teardown();
+        return 0;
       }
 
       if (e.type == sf::Event::KeyPressed)
@@ -632,6 +686,9 @@ int main()
           resetDrop = false;
           dropPoints = 0;
           break;
+        case sf::Keyboard::Q:
+          teardown();
+          return 0;
         }
       }
 
