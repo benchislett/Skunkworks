@@ -4,13 +4,16 @@
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
-#define width 256
-#define height 256
-#define num_triangles 50
-#define transparency 0.5
+int width;
+int height;
+int num_triangles = 50;
+unsigned int iterations = 100000;
+unsigned int printSteps = 100;
+double transparency = 0.5;
 
-unsigned int triangles[num_triangles][9];
+unsigned int **triangles;
 double fitness = 0.0;
 long int timestep = 1;
 
@@ -21,6 +24,29 @@ cairo_t *cr;
 
 struct timespec start;
 struct timespec end;
+
+void parse_args(int argc, char *argv[])
+{
+  int opt;
+  while ((opt = getopt(argc, argv, "n:i:p:")) != -1)
+  {
+    switch (opt)
+    {
+    case 'n':
+      num_triangles = atoi(optarg);
+      break;
+    case 'i':
+      iterations = atoi(optarg);
+      break;
+    case 'p':
+      printSteps = atoi(optarg);
+      break;
+    default:
+      fprintf(stderr, "Usage: %s [-n numTriangles] [-i iterations] [-p printFrequency]\n", argv[0]);
+      exit(EXIT_FAILURE);
+    }
+  }
+}
 
 void new_triangle(int i)
 {
@@ -38,13 +64,19 @@ void new_triangle(int i)
 void setup()
 {
   srand(time(NULL));
+
   target = cairo_image_surface_create_from_png("data/target.png");
+
+  width = cairo_image_surface_get_width(target);
+  height = cairo_image_surface_get_height(target);
 
   surface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, width, height);
   cr = cairo_create(surface);
 
+  triangles = (unsigned int **)malloc(num_triangles * sizeof(unsigned int *));
   for (int i = 0; i < num_triangles; i++)
   {
+    triangles[i] = (int *)malloc(9 * sizeof(unsigned int));
     new_triangle(i);
   }
 }
@@ -162,13 +194,15 @@ void teardown()
   cairo_surface_destroy(target);
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+  parse_args(argc, argv);
+
   setup();
 
-  for (int i = 0; i < 10000000; i++)
+  for (int i = 0; i < iterations; i++)
   {
-    if (i % 100 == 0)
+    if (i % printSteps == 0)
     {
       clock_gettime(CLOCK_REALTIME, &end);
       printf("Iterations: %d, Improvements: %ld, Fitness: %f, Iterations/second: %ld\n", i, timestep, fitness, (long)(1000000000.0 * 100.0 / time_diff(start, end)));
