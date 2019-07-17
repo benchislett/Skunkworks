@@ -38,7 +38,7 @@ void new_triangle(int i)
 void setup()
 {
   srand(time(NULL));
-  target = cairo_image_surface_create_from_png("target.png");
+  target = cairo_image_surface_create_from_png("data/target.png");
 
   surface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, width, height);
   cr = cairo_create(surface);
