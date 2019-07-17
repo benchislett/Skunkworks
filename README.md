@@ -9,6 +9,7 @@ Miscellaneous programming exercises and projects, sorted by language
   - [NES Tetris](C++/Tetris/README.md) (`SFML`)
 - Julia
 - - [OIST Skill-Pill Notes](Julia/Skill-Pill/README.md)
+- - [OIST Scientific Computing in Julia Workshop](Julia/Workshop/README.md)
 - Python
   - [Split-Step Fourier Method NLSE solver](Python3/Split-Operator-Solver/README.md)
   - [Video to Ascii converter](Python3/video2ascii/README.md) (`curses`)
