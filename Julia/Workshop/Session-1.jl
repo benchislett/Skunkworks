@@ -1,4 +1,4 @@
-# Efficient Scientific Computing in Julia (OIST) 10am-5:30pm Wednesday July 17, 2019
+# Efficient Scientific Computing in Julia (OIST) 10am-12pm Wednesday July 17, 2019
 # by Valentin Churavy, JuliaLab, CSAIL, MIT
 
 # Documentation: https://docs.julialang.org/en/stable
