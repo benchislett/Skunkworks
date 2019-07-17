@@ -4,6 +4,8 @@
 
 Recreation of the NES Tetris game in C++ using the SFML graphics library.
 
+![Game over screen](output/output.png)
+
 ## Installation
 
 ### Dependencies
