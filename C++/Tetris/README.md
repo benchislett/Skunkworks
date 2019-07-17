@@ -35,5 +35,7 @@ If unsure about rules or gameplay, refer to the [NES classis tetris manual](http
 
 - Add title screen
 - Add victory screen
+- Add "lightning" effect when tetris is achieved
+- Add configurable button presses
 - Limit integer values to their maximum digit count
 - Add sound effects
