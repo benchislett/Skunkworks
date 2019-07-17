@@ -1,8 +1,11 @@
 default: main
 
 main: main.c
-	gcc main.c -o main.out -I /usr/include/cairo -L /usr/lib -lcairo
+	gcc main.c -I /usr/include/cairo -L /usr/lib -lcairo -o generate
 
 .PHONY: clean
 clean:
-	rm -f *.o *.out
+	# Remove object and executable files
+	rm -f *.o *.out generate
+	# Reset output image
+	git checkout -- output/output.png
