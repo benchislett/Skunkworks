@@ -28,3 +28,10 @@ Gameplay is relatively simple:
 - To exit the game, press "q"
 
 If unsure about rules or gameplay, refer to the [NES classis tetris manual](https://www.retrogames.cz/manualy/NES/Tetris_(Nintendo)_-_NES_-_Manual.pdf)
+
+## TODOs
+
+- Add title screen
+- Add victory screen
+- Limit integer values to their maximum digit count
+- Add sound effects
