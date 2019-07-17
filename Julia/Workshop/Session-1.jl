@@ -5,7 +5,7 @@
 # Forum: https://discourse.julialang.org
 # ThinkJulia: https://benlauwens.github.io/ThinkJulia.jl/latest/book.html
 # Packages: https://juliaobserver.org and https://pkg.julialang.org
-# Videos: https://youtube.com/TheJuliaLanguage
+# Videos: https://youtube.com/user/JuliaLanguage
 
 #=
 Best practices for Scientific Code
