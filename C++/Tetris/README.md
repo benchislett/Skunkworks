@@ -15,6 +15,7 @@ The only nonstandard dependency is [SFML](https://www.sfml-dev.org/), a graphics
 ### Makefile
 
 The executable is built with g++ to a file named `tetris`, built with `make`.
+
 `make clean` will clear any object and executable files lingering, as well as resetting the highscore and output image.
 
 ## Usage
