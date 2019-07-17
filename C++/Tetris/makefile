@@ -6,3 +6,5 @@ main: main.cpp
 .PHONY: clean
 clean:
 	rm -f *.out *.o
+	git checkout -- output/output.png
+	echo -n 0 > data/highscore.cfg
