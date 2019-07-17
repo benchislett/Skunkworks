@@ -16,3 +16,6 @@ __pycache__/
 
 # C++/Tetris executable
 tetris
+
+# C/Triangle-Image-Evolution executable
+generate
