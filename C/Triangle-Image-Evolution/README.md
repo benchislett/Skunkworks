@@ -12,7 +12,7 @@ Starting from a random initial state, triangles are mutated randomly and if the 
 
 The only nonstandard dependency is the [cairo graphics library](https://cairographics.org/), and is should be able to be found with `-lcairo`
 
-## Makefile
+### Makefile
 
 The executable is built with gcc to a file named `generate`, built with `make`.
 
