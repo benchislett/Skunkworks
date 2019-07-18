@@ -448,7 +448,7 @@ void check_clear_lines()
 
   for (ushort row : to_clear)
   {
-    for (int i = row; i > 2; i--)
+    for (int i = row; i > 0; i--)
     {
       for (int j = 0; j < cols; j++)
       {
