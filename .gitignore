@@ -14,6 +14,9 @@ __pycache__/
 # Videos
 *.mp4
 
+# C++/Game-of-Life executable
+gameoflife
+
 # C++/Tetris executable
 tetris
 
