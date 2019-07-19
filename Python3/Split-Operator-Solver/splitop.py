@@ -24,6 +24,10 @@ K_I = np.concatenate((np.arange(0, RES / 2), np.arange(-RES / 2, 0))) * DK
 
 V = 0.5 * X ** 2
 WFC = np.exp(-((X + 1) ** 2) / 2, dtype=complex)
+
+
+# Init Operators
+
 K = np.exp(-0.5 * (K_I ** 2) * STEP_SIZE * 1j, dtype=complex)
 R = np.exp(-0.5 * V * STEP_SIZE * 1j, dtype=complex)
 
