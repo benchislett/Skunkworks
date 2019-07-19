@@ -14,7 +14,7 @@ The only nonstandard dependency is the [cairo graphics library](https://cairogra
 
 ### Makefile
 
-The executable is built with gcc to a file named `generate`, built with `make`.
+The executable is built with gcc to a file named `generate`, via the `make` command.
 
 `make clean` will clear any object and executable files lingering, as well as resetting the output image.
 
