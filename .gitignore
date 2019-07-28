@@ -22,3 +22,6 @@ tetris
 
 # C/Triangle-Image-Evolution executable
 generate
+
+# C/Langtons-Ant
+simulate
