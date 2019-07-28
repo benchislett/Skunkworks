@@ -10,7 +10,7 @@ Starting from a random initial state, triangles are mutated randomly and if the 
 
 ### Dependencies
 
-The only nonstandard dependency is the [cairo graphics library](https://cairographics.org/), and is should be able to be found with `-lcairo`
+The only nonstandard dependency is the [cairo graphics library](https://cairographics.org/)
 
 ### Makefile
 
