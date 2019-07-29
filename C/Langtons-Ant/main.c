@@ -1,14 +1,13 @@
 // Enable some functionality for cairo
 #define _POSIX_C_SOURCE 200809L
 
-#include <cairo.h>
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
-#define width 256
-#define height 256
+#define width 2048
+#define height 2048
 
 // Arguments with defaults
 unsigned int max_iterations = 20000;
@@ -24,10 +23,6 @@ int field[width][height];
 short direction; // { 0: N, 1: E, 2: S, 3: W }
 long x;
 long y;
-
-// Surface for the main image, and the cairo instance
-cairo_surface_t *surface;
-cairo_t *cr;
 
 // Structure for colours
 typedef struct {
@@ -59,10 +54,6 @@ void parse_args(int argc, char *argv[])
 // Initialize the global variables
 void setup()
 {
-  // Create the context for the main image
-  surface = cairo_image_surface_create(CAIRO_FORMAT_RGB24, width, height);
-  cr = cairo_create(surface);
-
   // Clear the field
   for (int i = 0; i < width; i++) {
     for (int j = 0; j < height; j++) {
@@ -76,36 +67,6 @@ void setup()
   direction = 0;
 }
 
-// Destroy, deallocate, and conclude operations
-void teardown()
-{
-  // Destroy cairo objects
-  cairo_destroy(cr);
-  cairo_surface_write_to_png(surface, "output/output.png");
-  cairo_surface_destroy(surface);
-
-  printf("\n");
-  exit(0);
-}
-
-// Wipe the canvas
-void set_background_colour()
-{
-  cairo_set_source_rgb(cr, 0.0, 0.0, 0.0);
-  cairo_rectangle(cr, 0, 0, width, height);
-  cairo_fill(cr);
-}
-
-// Draw a single pixel
-void draw_pixel(long x, long y, Colour c) {
-  // Don't waste time drawing pixels that have the same colour as the background
-  if (c.r != 0.0 || c.g != 0.0 || c.b != 0.0) {
-    cairo_set_source_rgb(cr, c.r, c.g, c.b);
-    cairo_rectangle(cr, x, y, 1, 1);
-    cairo_fill(cr);
-  }
-}
-
 // Get the Colour of a given pixel
 Colour get_colour(int x, int y) {
   switch (field[x][y]) {
@@ -116,15 +77,39 @@ Colour get_colour(int x, int y) {
   }
 }
 
-// Fix the background colour
+// Output the rendered image in bitmap format
 void draw()
 {
-  set_background_colour();
+  static unsigned char header[54] = {66,77,0,0,0,0,0,0,0,0,54,0,0,0,40,0,0,0,0,0,0,0,0,0,0,0,1,0,24,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+  FILE *fp = fopen("output/output.bmp", "w");
+  unsigned int* header_file_size = (unsigned int*) &header[2];
+	*header_file_size = 54 + (3 * width + (4 - ((3 * width) % 4)) % 4)*height;  
+	unsigned int* header_width = (unsigned int*) &header[18];    
+	*header_width = width;
+	unsigned int* header_height = (unsigned int*) &header[22];    
+	*header_height = height;
+  fwrite(header, 54, 1, fp);
+  static unsigned char data[width*height*3];
   for (int i = 0; i < width; i++) {
     for (int j = 0; j < height; j++) {
-      draw_pixel(i, j, get_colour(i, j));
+      Colour c = get_colour(i, j);
+      data[3 * (j * width + i)] = (unsigned char)(c.b * 255.0);
+      data[3 * (j * width + i) + 1] = (unsigned char)(c.g * 255.0);
+      data[3 * (j * width + i) + 2] = (unsigned char)(c.r * 255.0);
     }
   }
+  fwrite(data, 3*width*height, 1, fp);
+  fclose(fp);
+}
+
+// Destroy, deallocate, and conclude operations
+void teardown()
+{
+  // Output the field to an image
+  draw();
+
+  printf("\n");
+  exit(0);
 }
 
 // Show a progress bar towards the iteration limit
@@ -195,7 +180,6 @@ void step()
   flip();
   walk();
   check();
-  draw();
 }
 
 int main(int argc, char *argv[])
