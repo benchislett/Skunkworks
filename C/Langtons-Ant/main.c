@@ -87,15 +87,26 @@ Colour get_colour(int x, int y) {
 // Output the rendered image in bitmap format
 void draw()
 {
+  // Header bytes
   static unsigned char header[54] = {66,77,0,0,0,0,0,0,0,0,54,0,0,0,40,0,0,0,0,0,0,0,0,0,0,0,1,0,24,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
+  
+  // Target file
   FILE *fp = fopen("output/output.bmp", "w");
+  
+  // Update the file size section of the header
   unsigned int* header_file_size = (unsigned int*) &header[2];
-	*header_file_size = 54 + (3 * width + (4 - ((3 * width) % 4)) % 4)*height;  
+	*header_file_size = 54 + (3 * width + (4 - ((3 * width) % 4)) % 4)*height;
+  
+  // Update the width and height section of the header
 	unsigned int* header_width = (unsigned int*) &header[18];    
 	*header_width = width;
 	unsigned int* header_height = (unsigned int*) &header[22];    
 	*header_height = height;
+
+  // Write the header
   fwrite(header, 54, 1, fp);
+
+  // Fill a bytemap with the field data
   static unsigned char data[width*height*3];
   for (int i = 0; i < width; i++) {
     for (int j = 0; j < height; j++) {
@@ -105,7 +116,11 @@ void draw()
       data[3 * (j * width + i) + 2] = (unsigned char)(c.r * 255.0);
     }
   }
+
+  // Write the data
   fwrite(data, 3*width*height, 1, fp);
+
+  // Close the file
   fclose(fp);
 }
 
