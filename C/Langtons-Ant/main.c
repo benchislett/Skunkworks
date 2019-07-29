@@ -30,7 +30,7 @@ struct timespec end;
 void parse_args(int argc, char *argv[])
 {
   int opt;
-  while ((opt = getopt(argc, argv, "i:p:")) != -1)
+  while ((opt = getopt(argc, argv, "i:")) != -1)
   {
     switch (opt)
     {
