@@ -12,10 +12,12 @@ int height = 256;
 
 // Arguments with defaults
 unsigned int iterations = 1000;
-unsigned int printSteps = 100;
 
 // Set the global timestep counter
 long int timestep = 1;
+
+// Length of progress bar
+int barlen = 12;
 
 // Surface for the main image, and the cairo instance
 cairo_surface_t *surface;
@@ -36,13 +38,9 @@ void parse_args(int argc, char *argv[])
       // Number of iterations to run the simulation
       iterations = atoi(optarg);
       break;
-    case 'p':
-      // Number of steps between each printing to stdout
-      printSteps = atoi(optarg);
-      break;
     default:
       // Print a help script if invalid arguments are entered
-      fprintf(stderr, "Usage: %s [-i iterations] [-p printFrequency]\n", argv[0]);
+      fprintf(stderr, "Usage: %s [-i iterations] \n", argv[0]);
       exit(EXIT_FAILURE);
     }
   }
@@ -70,18 +68,20 @@ void draw()
   set_background_colour();
 }
 
+void show_progress(double i, double imax) {
+  printf("[");
+  int progress = barlen * (i / imax);
+  for (int j = 0; j < barlen; j++) {
+    printf(j <= progress ? "." : " ");
+  }
+  printf("]\r");
+  fflush(stdout);
+}
+
 // Advance the simulation
 void step()
 {
   draw();
-}
-
-// Evalutate the difference between two timespec instances in seconds
-double time_diff(struct timespec a, struct timespec b)
-{
-  // Get the second difference and add the scaled nanosecond difference
-  double diff = (double)(end.tv_sec - start.tv_sec) + ((end.tv_nsec - start.tv_nsec) / 1000000000.0);
-  return diff;
 }
 
 // Destroy, deallocate, and conclude operations
@@ -91,6 +91,8 @@ void teardown()
   cairo_destroy(cr);
   cairo_surface_write_to_png(surface, "output/output.png");
   cairo_surface_destroy(surface);
+
+  printf("\n");
 }
 
 int main(int argc, char *argv[])
@@ -104,16 +106,11 @@ int main(int argc, char *argv[])
   // Main loop
   for (int i = 0; i < iterations; i++)
   {
-    // Print out some data every `printSteps` iterations
-    if (i % printSteps == 0)
-    {
-      clock_gettime(CLOCK_REALTIME, &end);
-      printf("Iterations: %d, Framerate: %ld\n", i, (long)((double)printSteps / time_diff(start, end)));
-      clock_gettime(CLOCK_REALTIME, &start);
-    }
-
     // Advance evolution
     step();
+
+    // Display progress bar
+    show_progress((double)i, (double)iterations);
   }
 
   // Finish up before exiting
