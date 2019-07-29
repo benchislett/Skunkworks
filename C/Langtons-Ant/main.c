@@ -6,17 +6,17 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define width 2048
-#define height 2048
+#define width 1024
+#define height 1024
 
 // Arguments with defaults
-unsigned int max_iterations = 20000;
+unsigned int max_iterations = 250000;
 
 // Set the global timestep counter
 long timestep = 1;
 
 // Length of progress bar
-int barlen = 72;
+int barlen = 64;
 
 // Create the game state
 int field[width][height];
@@ -76,11 +76,11 @@ Colour get_colour(int x, int y) {
     case 0:
       return (Colour){1.0, 1.0, 1.0};
     case 1:
-      return (Colour){0.6, 0.6, 0.6};
+      return (Colour){0.5, 0.0, 1.0};
     case 2:
-      return (Colour){0.3, 0.3, 0.3};
+      return (Colour){1.0, 0.5, 0.0};
     case 3:
-      return (Colour){0.0, 0.0, 0.0};
+      return (Colour){0.0, 1.0, 0.5};
   }
 }
 
@@ -141,7 +141,7 @@ void show_progress(double i, double imax) {
   for (int j = 0; j < barlen; j++) {
     printf(j <= progress ? "." : " ");
   }
-  printf("]\r");
+  printf("] Iteration: %ld\r", (long)i);
   fflush(stdout);
 }
 
