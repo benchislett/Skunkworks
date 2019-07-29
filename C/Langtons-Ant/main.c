@@ -31,6 +31,9 @@ typedef struct {
   double b;
 } Colour;
 
+// Number of states
+int states = 4;
+
 // Parse the command arguments into the global variables
 void parse_args(int argc, char *argv[])
 {
@@ -73,6 +76,10 @@ Colour get_colour(int x, int y) {
     case 0:
       return (Colour){1.0, 1.0, 1.0};
     case 1:
+      return (Colour){0.6, 0.6, 0.6};
+    case 2:
+      return (Colour){0.3, 0.3, 0.3};
+    case 3:
       return (Colour){0.0, 0.0, 0.0};
   }
 }
@@ -139,14 +146,18 @@ void rotate() {
       rotate_n(1);
       break;
     case 1:
+    case 2:
       rotate_n(-1);
+      break;
+    case 3:
+      rotate_n(1);
       break;
   }
 }
 
 // Modify the state of the tile the ant is currently standing on
 void flip() {
-  field[x][y] = (field[x][y] + 1) % 2;
+  field[x][y] = (field[x][y] + 1) % states;
 }
 
 // Advance the position of the ant a single unit in its current direction
