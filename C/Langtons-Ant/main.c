@@ -11,6 +11,7 @@ unsigned long max_iterations = 250000;
 int width = 256;
 int height = 256;
 char fname[64] = "output/output.bmp";
+char pattern[16] = "LRRRRRLLR";
 
 // Set the global timestep counter
 long timestep = 1;
@@ -26,19 +27,19 @@ long y;
 
 // Structure for colours
 typedef struct {
-  double r;
-  double g;
-  double b;
+  unsigned char r;
+  unsigned char g;
+  unsigned char b;
 } Colour;
 
 // Number of states
-int states = 4;
+int states;
 
 // Parse the command arguments into the global variables
 void parse_args(int argc, char *argv[])
 {
   int opt;
-  while ((opt = getopt(argc, argv, "i:x:y:o:")) != -1)
+  while ((opt = getopt(argc, argv, "i:x:y:o:p:")) != -1)
   {
     switch (opt)
     {
@@ -58,6 +59,10 @@ void parse_args(int argc, char *argv[])
       // Output file name (relative to executable)
       strcpy(fname, optarg);
       break;
+    case 'p':
+      // Decision pattern
+      strcpy(pattern, optarg);
+      break;
     default:
       // Print a help script if invalid arguments are entered
       fprintf(stderr, "Usage: %s [-i max_iters] [-x width] [-y height] [-o output_file] \n", argv[0]);
@@ -69,6 +74,9 @@ void parse_args(int argc, char *argv[])
 // Initialize the global variables
 void setup()
 {
+  // Declare the number of states to the field
+  states = strlen(pattern);
+
   // Allocate memory for the field
   field = (int **)malloc(width * sizeof(int *));
   for (int i = 0; i < width; i++) {
@@ -85,13 +93,37 @@ void setup()
 Colour get_colour(int x, int y) {
   switch (field[x][y]) {
     case 0:
-      return (Colour){1.0, 1.0, 1.0};
+      return (Colour){255, 255, 255};
     case 1:
-      return (Colour){0.5, 0.0, 1.0};
+      return (Colour){93, 39, 93};
     case 2:
-      return (Colour){1.0, 0.5, 0.0};
+      return (Colour){177, 62, 83};
     case 3:
-      return (Colour){0.0, 1.0, 0.5};
+      return (Colour){239, 125, 87};
+    case 4:
+      return (Colour){255, 205, 117};
+    case 5:
+      return (Colour){167, 240, 112};
+    case 6:
+      return (Colour){56, 183, 100};
+    case 7:
+      return (Colour){37, 113, 121};
+    case 8:
+      return (Colour){41, 54, 111};
+    case 9:
+      return (Colour){59, 93, 201};
+    case 10:
+      return (Colour){65, 166, 249};
+    case 11:
+      return (Colour){115, 239, 247};
+    case 12:
+      return (Colour){148, 176, 194};
+    case 13:
+      return (Colour){86, 108, 134};
+    case 14:
+      return (Colour){51, 60, 87};
+    case 15:
+      return (Colour){26, 28, 44};
   }
 }
 
@@ -122,9 +154,9 @@ void draw()
   for (int i = 0; i < width; i++) {
     for (int j = 0; j < height; j++) {
       Colour c = get_colour(i, j);
-      data[3 * (j * width + i)] = (unsigned char)(c.b * 255.0);
-      data[3 * (j * width + i) + 1] = (unsigned char)(c.g * 255.0);
-      data[3 * (j * width + i) + 2] = (unsigned char)(c.r * 255.0);
+      data[3 * (j * width + i)] = c.b;
+      data[3 * (j * width + i) + 1] = c.g;
+      data[3 * (j * width + i) + 2] = c.r;
     }
   }
 
@@ -173,16 +205,16 @@ void rotate_n(int n) {
 
 // Rotate the ant based on the colour of the tile
 void rotate() {
-  switch (field[x][y]) {
-    case 0:
+  char action = pattern[field[x][y]];
+  switch (action) {
+    case 'R':
       rotate_n(1);
       break;
-    case 1:
-    case 2:
+    case 'L':
       rotate_n(-1);
       break;
-    case 3:
-      rotate_n(1);
+    case 'U':
+      rotate_n(2);
       break;
   }
 }

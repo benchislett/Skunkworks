@@ -12,9 +12,9 @@ The ant then acts based on the value of the tile, either turning right, left, ar
 The ant then takes a single step "forwards", and the cycle repeats.
 
 This has shown to create interesting patterns which depend on the number of values in the field, and the decision of the ant.
-The below output was created by simulating 1,757,071 iterations with the pattern given in the source.
+The below output was created by simulating 250,000 iterations with the default pattern.
 
-![Output over 1,757,071 iterations](./output/output.bmp)
+![Output over 250,000 iterations](./output/output.bmp)
 
 ## Installation
 
@@ -41,8 +41,8 @@ The program takes a several arguments:
 - - `default: 256`
 - `-o string` is the name of the output image file, and should end in `.bmp`
 - - `default: "output/output.bmp"
+- `-p string` is the pattern to follow. The length determines the number of states for the field, and each value can be one of 'R', 'U', 'L', or 'N' for 90, 180, 270, and 360 degrees clockwise respectively.
+- - `default: "LRRRRRLLR"`
 
 ## TODOs
-
-- Parameterize the movement pattern
 
