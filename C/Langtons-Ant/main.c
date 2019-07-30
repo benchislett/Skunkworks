@@ -6,8 +6,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define width 1024
-#define height 1024
+#define width 256
+#define height 256
 
 // Arguments with defaults
 unsigned int max_iterations = 250000;
