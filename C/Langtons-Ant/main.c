@@ -6,11 +6,10 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-#define width 256
-#define height 256
-
 // Arguments with defaults
-unsigned int max_iterations = 250000;
+unsigned long max_iterations = 250000;
+int width = 256;
+int height = 256;
 
 // Set the global timestep counter
 long timestep = 1;
@@ -19,7 +18,7 @@ long timestep = 1;
 int barlen = 64;
 
 // Create the game state
-int field[width][height];
+int **field;
 short direction; // { 0: N, 1: E, 2: S, 3: W }
 long x;
 long y;
@@ -38,13 +37,21 @@ int states = 4;
 void parse_args(int argc, char *argv[])
 {
   int opt;
-  while ((opt = getopt(argc, argv, "i:")) != -1)
+  while ((opt = getopt(argc, argv, "i:x:y:")) != -1)
   {
     switch (opt)
     {
     case 'i':
       // Number of iterations to run the simulation before exiting
       max_iterations = atoi(optarg);
+      break;
+    case 'x':
+      // Width
+      width = atoi(optarg);
+      // Not breaking to set height=width if only width is set
+    case 'y':
+      // Height
+      height = atoi(optarg);
       break;
     default:
       // Print a help script if invalid arguments are entered
@@ -57,11 +64,10 @@ void parse_args(int argc, char *argv[])
 // Initialize the global variables
 void setup()
 {
-  // Clear the field
+  // Allocate memory for the field
+  field = (int **)malloc(width * sizeof(int *));
   for (int i = 0; i < width; i++) {
-    for (int j = 0; j < height; j++) {
-      field[i][j] = 0;
-    }
+    field[i] = (int *)calloc(height, sizeof(int));
   }
 
   // Set the starting position and orientation
@@ -107,7 +113,7 @@ void draw()
   fwrite(header, 54, 1, fp);
 
   // Fill a bytemap with the field data
-  static unsigned char data[width*height*3];
+  unsigned char *data = (unsigned char *)malloc(width * height * 3 * sizeof(unsigned char));
   for (int i = 0; i < width; i++) {
     for (int j = 0; j < height; j++) {
       Colour c = get_colour(i, j);
@@ -129,6 +135,12 @@ void teardown()
 {
   // Output the field to an image
   draw();
+
+  // Deallocate the field
+  for (int i = 0; i < width; i++) {
+    free(field[i]);
+  }
+  free(field);
 
   printf("\n");
   exit(0);
