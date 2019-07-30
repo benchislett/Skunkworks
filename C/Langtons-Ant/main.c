@@ -55,7 +55,7 @@ void parse_args(int argc, char *argv[])
       break;
     default:
       // Print a help script if invalid arguments are entered
-      fprintf(stderr, "Usage: %s [-i max_iters] \n", argv[0]);
+      fprintf(stderr, "Usage: %s [-i max_iters] [-x width] [-y height] \n", argv[0]);
       exit(EXIT_FAILURE);
     }
   }
