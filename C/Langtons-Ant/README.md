@@ -12,9 +12,17 @@ The ant then acts based on the value of the tile, either turning right, left, ar
 The ant then takes a single step "forwards", and the cycle repeats.
 
 This has shown to create interesting patterns which depend on the number of values in the field, and the decision of the ant.
-The below output was created by simulating 250,000 iterations with the default pattern.
+The below examples were created with the default iterations, 128x128 dimensions, and varying patterns.
 
-![Output over 250,000 iterations](./output/output.bmp)
+![RL](./output/example_1.bmp)
+![RLLR](./output/example_1.bmp)
+![RRLL](./output/example_1.bmp)
+![RLR](./output/example_1.bmp)
+![LRRRRRLLR (default pattern)](./output/example_1.bmp)
+
+
+
+
 
 ## Installation
 
