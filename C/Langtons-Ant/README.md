@@ -33,9 +33,12 @@ The executable is built with gcc to a file named `simulate`, via the `make` comm
 ## Usage
 
 The program takes a several arguments:
-- `-i N` is the maximum iteration limit. If the ant reaches the outer bounds of the grid before that capacity is reached, the program will terminate early.
-- `-x N` is the width of the simulation. If only the width is set, the height will be set to the same value.
-- `-y N` is the height of the simulation. The above property does not apply to the height.
+- `-i int` is the maximum iteration limit. If the ant reaches the outer bounds of the grid before that capacity is reached, the program will terminate early.
+- - `default: 250_000`
+- `-x int` is the width of the simulation.
+- - `default: 256`
+- `-y int` is the height of the simulation. 
+- - `default: 256`
 
 ## TODOs
 

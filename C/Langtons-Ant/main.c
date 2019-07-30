@@ -48,7 +48,7 @@ void parse_args(int argc, char *argv[])
     case 'x':
       // Width
       width = atoi(optarg);
-      // Not breaking to set height=width if only width is set
+      break;
     case 'y':
       // Height
       height = atoi(optarg);
