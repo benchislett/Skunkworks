@@ -39,4 +39,5 @@ If the ant reaches the outer bounds of the grid before that capacity is reached,
 
 - Parameterize width and height
 - Parameterize the movement pattern
+- Parameterize output file name
 
