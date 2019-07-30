@@ -15,10 +15,10 @@ This has shown to create interesting patterns which depend on the number of valu
 The below examples were created with the default iterations, 128x128 dimensions, and varying patterns.
 
 ![RL](./output/example_1.bmp)
-![RLLR](./output/example_1.bmp)
-![RRLL](./output/example_1.bmp)
-![RLR](./output/example_1.bmp)
-![LRRRRRLLR (default pattern)](./output/example_1.bmp)
+![RLLR](./output/example_2.bmp)
+![RRLL](./output/example_3.bmp)
+![RLR](./output/example_4.bmp)
+![LRRRRRLLR (default pattern)](./output/example_5.bmp)
 
 
 
