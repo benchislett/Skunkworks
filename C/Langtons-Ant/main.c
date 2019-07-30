@@ -1,15 +1,16 @@
 // Enable some functionality for cairo
 #define _POSIX_C_SOURCE 200809L
 
-#include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 // Arguments with defaults
 unsigned long max_iterations = 250000;
 int width = 256;
 int height = 256;
+char fname[64] = "output/output.bmp";
 
 // Set the global timestep counter
 long timestep = 1;
@@ -37,7 +38,7 @@ int states = 4;
 void parse_args(int argc, char *argv[])
 {
   int opt;
-  while ((opt = getopt(argc, argv, "i:x:y:")) != -1)
+  while ((opt = getopt(argc, argv, "i:x:y:o:")) != -1)
   {
     switch (opt)
     {
@@ -53,9 +54,13 @@ void parse_args(int argc, char *argv[])
       // Height
       height = atoi(optarg);
       break;
+    case 'o':
+      // Output file name (relative to executable)
+      strcpy(fname, optarg);
+      break;
     default:
       // Print a help script if invalid arguments are entered
-      fprintf(stderr, "Usage: %s [-i max_iters] [-x width] [-y height] \n", argv[0]);
+      fprintf(stderr, "Usage: %s [-i max_iters] [-x width] [-y height] [-o output_file] \n", argv[0]);
       exit(EXIT_FAILURE);
     }
   }
@@ -97,7 +102,7 @@ void draw()
   static unsigned char header[54] = {66,77,0,0,0,0,0,0,0,0,54,0,0,0,40,0,0,0,0,0,0,0,0,0,0,0,1,0,24,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
   
   // Target file
-  FILE *fp = fopen("output/output.bmp", "w");
+  FILE *fp = fopen(fname, "w");
   
   // Update the file size section of the header
   unsigned int* header_file_size = (unsigned int*) &header[2];

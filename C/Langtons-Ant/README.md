@@ -39,9 +39,10 @@ The program takes a several arguments:
 - - `default: 256`
 - `-y int` is the height of the simulation. 
 - - `default: 256`
+- `-o string` is the name of the output image file, and should end in `.bmp`
+- - `default: "output/output.bmp"
 
 ## TODOs
 
 - Parameterize the movement pattern
-- Parameterize output file name
 
