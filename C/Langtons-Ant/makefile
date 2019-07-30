@@ -8,4 +8,4 @@ clean:
 	# Remove object and executable files
 	rm -f *.o *.out simulate
 	# Reset output image
-	git checkout -- output/output.png
+	git checkout -- output/
