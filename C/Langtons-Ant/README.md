@@ -40,9 +40,11 @@ The program takes a several arguments:
 - `-y int` is the height of the simulation. 
 - - `default: 256`
 - `-o string` is the name of the output image file, and should end in `.bmp`
-- - `default: "output/output.bmp"
+- - `default: "output/output.bmp"`
 - `-p string` is the pattern to follow. The length determines the number of states for the field, and each value can be one of 'R', 'U', 'L', or 'N' for 90, 180, 270, and 360 degrees clockwise respectively.
 - - `default: "LRRRRRLLR"`
 
 ## TODOs
+
+- Add multiple pattern examples
 
