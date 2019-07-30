@@ -4,6 +4,7 @@ Miscellaneous programming exercises and projects, sorted by language
 
 - C
   - [Triangle Image Evolution](C/Triangle-Image-Evolution/) (`cairo`)
+  - [Langton's Ant](C/Langtons-Ant/)
 - C++
   - [Conway's Game of Life implementation](C++/Game-of-Life/) (`SFML`)
   - [NES Tetris](C++/Tetris/) (`SFML`)
