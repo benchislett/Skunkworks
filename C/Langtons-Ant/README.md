@@ -20,10 +20,6 @@ The below examples were created with the default iterations, 128x128 dimensions,
 ![RLR](./output/example_4.bmp)
 ![LRRRRRLLR (default pattern)](./output/example_5.bmp)
 
-
-
-
-
 ## Installation
 
 ### Dependencies
@@ -53,6 +49,4 @@ The program takes a several arguments:
 - - `default: "LRRRRRLLR"`
 
 ## TODOs
-
-- Add multiple pattern examples
 
