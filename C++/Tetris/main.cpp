@@ -467,7 +467,7 @@ bool conflict()
 }
 
 // Run the game over procedure
-int game_over()
+void game_over()
 {
   // Draw the shutters
   draw_shutters();
