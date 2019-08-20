@@ -11,7 +11,7 @@ Miscellaneous programming exercises and projects, sorted by language
 - Julia
   - [OIST Skill-Pill Notes](Julia/Skill-Pill/)
   - [OIST Scientific Computing in Julia Workshop](Julia/Workshop/)
-  - [Julia Set Renderer](Julia/Fractal-Renderer/) (`CSFML.jl`)
+  - [Julia Set Renderer](Julia/Fractal-Render/) (`CSFML.jl`)
 - Python
   - [Split-Step Fourier Method NLSE solver](Python3/Split-Operator-Solver/)
   - [Video to Ascii converter](Python3/video2ascii/) (`curses`)
