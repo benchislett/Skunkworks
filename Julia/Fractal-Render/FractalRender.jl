@@ -8,8 +8,8 @@ module FractalRender
   include("./render.jl")
 
   function main()
-    renderState = RenderState()
-    simState = State()
+    renderState = RenderState(width=512, height=512)
+    simState = State(res=(512,512), iterations=100)
 
     event = Ref{sfEvent}()
     while Bool(sfRenderWindow_isOpen(renderState.window))
