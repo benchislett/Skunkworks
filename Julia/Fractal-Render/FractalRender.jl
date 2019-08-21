@@ -11,7 +11,7 @@ module FractalRender
     renderState = RenderState()
     simState = State()
 
-    event = Ref(sfEvent(sfEvtClosed))
+    event = Ref{sfEvent}()
     while Bool(sfRenderWindow_isOpen(renderState.window))
       while Bool(sfRenderWindow_pollEvent(renderState.window, event))
         if event.x.type == sfEvtClosed
