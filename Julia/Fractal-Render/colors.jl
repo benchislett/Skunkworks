@@ -29,6 +29,7 @@ The color is chosen linearly according to the above mapping, with the bounds bei
 """
 function getColor(state, n)
   idx = Int(floor(length(colorMap) * n / (state.iterations + 1))) + 1
+
   return colorMap[idx]
 end
 

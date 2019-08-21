@@ -6,7 +6,7 @@ mutable struct RenderState
   background::Any
 end
 
-function RenderState(width=512,height=512, background=sfColor_fromRGBA(0,0,0,1))
+function RenderState(; width=32,height=32, background=sfColor_fromRGBA(0,0,0,255))
   mode = sfVideoMode(width, height, 32)
 
   window = sfRenderWindow_create(mode, "Julia Fractal Renderer", sfResize | sfClose, C_NULL)
