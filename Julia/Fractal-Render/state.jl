@@ -4,7 +4,7 @@ mutable struct State
 
   iterations::Int64
 
-  res::Tuple{Float64, Float64}
+  res::Tuple{Int64, Int64}
 
   bounds::Tuple{Tuple{Float64, Float64}, Tuple{Float64, Float64}}
   lengths::Tuple{Float64, Float64}
