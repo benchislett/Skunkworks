@@ -10,10 +10,8 @@ function iterate!(state::State, idx)
 end
 
 function step!(state::State)
-  state.fieldIterations .= 0
   for i = 1:state.iterations
     iterate!(state, i)
   end
-  state.field .= 0.0
 end
 

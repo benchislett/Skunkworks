@@ -15,15 +15,27 @@ mutable struct State
   op::Function
 end
 
+""" Propagate changes in the core state (res, bounds) to dependents"""
+function updateState!(state::State)
+  state.field .= 0
+  state.fieldIterations .= 0
+
+  state.lengths = map(b -> b[2] - b[1], state.bounds)
+  
+  state.delta = state.lengths ./ state.res
+  state.deltas .= map(Idx -> complex(((Idx.I .- (1, 1) .- state.res ./ 2) .* state.delta)...), CartesianIndices(state.res))
+end
+
 function State(; iterations=20.0, res=(32, 32), bounds=((-2, 2), (-2, 2)), op=(z,c)->z^2+c)
-  field = zeros(Complex{Float64}, res)
-  fieldIterations = zeros(Int64, res)
+  field = Array{Complex{Float64}}(undef, res)
+  fieldIterations = Array{Int64}(undef, res)
+  
+  deltas = Array{Complex{Float64}}(undef, res)
 
-  lengths = map(b -> b[2] - b[1], bounds)
+  state = State(field, fieldIterations, iterations, res, bounds, (-1.0, -1.0), (-1.0, -1.0), deltas, op)
 
-  delta = lengths ./ res
-  deltas = map(Idx -> complex(((Idx.I .- (1, 1) .- res ./ 2) .* delta)...), CartesianIndices(res))
+  updateState!(state)
 
-  return State(field, fieldIterations, iterations, res, bounds, lengths, delta, deltas, op)
+  return state
 end
 
