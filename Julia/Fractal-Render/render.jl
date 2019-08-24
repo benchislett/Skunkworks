@@ -25,7 +25,7 @@ function RenderState(; width=32,height=32, background=sfColor_fromRGBA(0,0,0,255
 end
 
 function update!(simState::State, renderState::RenderState)
-  sfTexture_updateFromPixels(renderState.texture, map(n -> getColor(simState, n), simState.fieldIterations), simState.res..., 0, 0)
+  sfTexture_updateFromPixels(renderState.texture, map((val, n) -> getColor(val, n, simState.iterations), simState.field, simState.fieldIterations), simState.res..., 0, 0)
 end
 
 function render!(simState::State, renderState::RenderState)

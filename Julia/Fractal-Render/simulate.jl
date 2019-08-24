@@ -1,11 +1,10 @@
 function iterate!(state::State, idx)
   for I in CartesianIndices(state.res)
-    res = state.op(state.field[I], state.deltas[I])
-    if (abs2(res) < 4)
+    val = state.op(state.field[I], state.deltas[I])
+    if (abs2(val) <= 65536)
       state.fieldIterations[I] = idx
+      state.field[I] = val
     end
-
-    state.field[I] = res
   end
 end
 

@@ -1,5 +1,5 @@
 " Coloring scheme for the plot, in RGBA "
-colorMap = [
+const colorMap = [
   sfColor(0,0,0,255),
   sfColor(66,46,15,255),
   sfColor(26,8,26,255),
@@ -18,19 +18,38 @@ colorMap = [
   sfColor(105,51,3,255)
 ];
 
-"""
-  getColor(state::State, n::Integer)
+"""Linearly interpolate between two colors"""
+function lerp(colorA, colorB, scale)
+  r = UInt8(floor((1 - scale) * colorA.r + scale * colorB.r))
+  g = UInt8(floor((1 - scale) * colorA.g + scale * colorB.g))
+  b = UInt8(floor((1 - scale) * colorA.b + scale * colorB.b))
+  a = UInt8(floor((1 - scale) * colorA.a + scale * colorB.a))
 
-Each pixel is colored according to how many iterations were needed to exceed the threshold.
-The more steps it took, the more extreme the color.
-
-The color is chosen linearly according to the above mapping, with the bounds being 1 and the state's maximum for iterations
-
-"""
-function getColor(state, n)
-  idx = Int(floor(length(colorMap) * n / (state.iterations + 1))) + 1
-
-  return colorMap[idx]
+  return sfColor(r, g, b, a)
 end
 
+"""
+getColor(val::Complex{Float64}, n::Integer)
+
+Each color is colored exponentially according to its value after the simulation, and the number of steps needed for it to exceed that max value.
+
+The color is chosen according to a logarithmic scale and linearly interpolated with the next closest color to provide a smooth transition between colors.
+"""
+function getColor(val, n, nmax)
+  v = abs(val)
+  if v < 2
+    n_log = 0
+  else
+    n_log = log2(log2(v))
+  end
+
+  n = n - n_log
+
+  n = (n / nmax) * (length(colorMap) - 1)
+
+  colorA = colorMap[Int(floor(n)) + 1]
+  colorB = colorMap[Int(floor(n + 1)) % length(colorMap) + 1]
+
+  return lerp(colorA, colorB, n % 1)
+end
 
