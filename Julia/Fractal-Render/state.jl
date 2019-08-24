@@ -23,7 +23,11 @@ function updateState!(state::State)
   state.lengths = map(b -> b[2] - b[1], state.bounds)
   
   state.delta = state.lengths ./ state.res
-  state.deltas .= map(Idx -> complex(((Idx.I .- (1, 1) .- state.res ./ 2) .* state.delta)...), CartesianIndices(state.res))
+  for i=1:state.res[1]
+    for j=1:state.res[2]
+      state.deltas[i, j] = complex(state.bounds[1][1] + i * state.delta[1], state.bounds[2][1] + j * state.delta[2])
+    end
+  end
 end
 
 function State(; iterations=20.0, res=(32, 32), bounds=((-2, 2), (-2, 2)), op=(z,c)->z^2+c)

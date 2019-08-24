@@ -39,9 +39,14 @@ module FractalRender
           dy = pos.y / height
 
           newbounds = (
-                        simState.bounds[1] .* (1 - zoom*dx),
-                        simState.bounds[2] .* (1 - zoom*dy),
-                      )
+          (
+            simState.bounds[1][1] + zoom * dx * simState.lengths[1],
+            simState.bounds[1][2] - zoom * (1 - dx) * simState.lengths[1]
+          ),
+          (
+            simState.bounds[2][1] + zoom * dy * simState.lengths[2],
+            simState.bounds[2][2] - zoom * (1 - dy) * simState.lengths[2]
+          ))
 
           simState.bounds = newbounds
           updateState!(simState)
