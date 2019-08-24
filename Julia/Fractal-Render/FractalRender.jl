@@ -8,9 +8,9 @@ module FractalRender
   include("./render.jl")
 
   function main()
-    width = 512
-    height = 512
-    zoom = 0.1
+    width = 1000
+    height = 1000
+    zoom = 0.5
     renderState = RenderState(width=width, height=height)
     simState = State(res=(width,height), iterations=100)
 
