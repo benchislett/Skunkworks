@@ -11,8 +11,9 @@ module FractalRender
     width = 1000
     height = 1000
     zoom = 0.5
+    iterations=100
     renderState = RenderState(width=width, height=height)
-    simState = State(res=(width,height), iterations=100)
+    simState = State(res=(width,height), iterations=iterations)
 
     i = 0
 
@@ -24,6 +25,7 @@ module FractalRender
 
       while Bool(sfRenderWindow_pollEvent(renderState.window, event))
         if event.x.type == sfEvtClosed
+          sfImage_saveToFile(sfRenderWindow_capture(renderState.window), "output/output.png")
           sfRenderWindow_close(renderState.window)
         end
       end
