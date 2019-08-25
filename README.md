@@ -15,3 +15,5 @@ Miscellaneous programming exercises and projects, sorted by language
 - Python
   - [Split-Step Fourier Method NLSE solver](Python3/Split-Operator-Solver/)
   - [Video to Ascii converter](Python3/video2ascii/) (`curses`)
+  - [ResNet-18 Implementation](Python3/ResNet-18/) (`PyTorch`)
+
