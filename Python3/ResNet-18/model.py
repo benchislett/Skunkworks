@@ -1,12 +1,26 @@
 import torch
-from torch.nn import Conv2d, BatchNorm2d, MaxPool2d, AdaptiveAvgPool2d, Linear, ReLU, Sequential
+
+def Conv2d(in_channels, out_channels, kernel_size, stride):
+    out = Conv2d(in_channels, out_channels,
+                          kernel_size=kernel_size, stride=stride)
+    torch.nn.init.kaiming_normal_(out.weight, mode='fan_out',
+                                  nonlinearity='relu')
+    return out
+
+def BatchNorm2d(size):
+    out = BatchNorm2d(size)
+
+    torch.nn.init.constant_(out.weight, 1)
+    torch.nn.init.constant_(out.bias, 0)
+
+    return out
 
 class ResBlock(nn.Module):
 
     def __init__(self, in_channels, out_channels, stride=1):
         super(ResBlock, self).__init__()
 
-        self.activate = ReLU(inplace=True)
+        self.activate = torch.nn.ReLU(inplace=True)
 
         self.conv1 = Conv2d(in_channels, out_channels,
                             kernel_size=3, stride=stride)
@@ -52,22 +66,22 @@ class ResNet18(nn.Module):
     def __init__(self, num_classes):
         super(ResNet18, self).__init__()
 
-        self.activate = ReLU(inplace=True)
+        self.activate = torch.nn.ReLU(inplace=True)
 
         self.conv1 = Conv2d(3, 3, kernel_size=7,
                             stride=2, padding=3)
         self.bn1 = BatchNorm2d(3)
 
-        self.maxpool = MaxPool2d(kernel_size=3, stride=2, padding=1)
+        self.maxpool = torch.nn.MaxPool2d(kernel_size=3, stride=2, padding=1)
 
         self.layer1 = ResLayer(3, 64, stride=1, num_blocks=3)
         self.layer2 = ResLayer(64, 128, stride=2, num_blocks=3)
         self.layer3 = ResLayer(128, 256, stride=2, num_blocks=3)
         self.layer4 = ResLayer(256, 512, stride=2, num_blocks=3)
 
-        self.avgpool = AdaptiveAvgPool2d((1, 1))
+        self.avgpool = torch.nn.AdaptiveAvgPool2d((1, 1))
 
-        self.fc = Linear(512, num_classes)
+        self.fc = torch.nn.Linear(512, num_classes)
 
     def forward(self, x):
         x = self.conv1(x)
