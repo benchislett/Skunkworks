@@ -1,4 +1,5 @@
 import torch, torchvision
+import os
 
 from model import ResNet18
 
@@ -10,11 +11,10 @@ toTensor = torchvision.transforms.Compose([
     torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 ])
 
-dataset_train = torchvision.datasets.STL10(root='./data', split="train", download=True, transform=toTensor)
+dataset_train = torchvision.datasets.STL10(root='~/.ml_data', split="train", download=True, transform=toTensor)
 train_loader = torch.utils.data.DataLoader(dataset_train, batch_size=128, shuffle=True)
 
-dataset_test = torchvision.datasets.STL10(root='./data', split="test", download=True, transform=toTensor)
-test_loader = torch.utils.data.DataLoader(dataset_test, shuffle=True)
+dataset_test = torchvision.datasets.STL10(root='~/.ml_data', split="test", download=True, transform=toTensor)
 
 model = ResNet18(10).cuda()
 
@@ -38,7 +38,11 @@ for epoch in range(64):
         loss_acc += loss_tmp
         num_batches += 1
 
-    print("\n\nEpoch {} Complete! Loss: {}\n\n".format(epoch, loss_acc / num_batches))
+    print("Epoch {}\t Loss: {}".format(epoch, loss_acc / num_batches))
 
 print("Training complete!")
+
+torch.save(model.state_dict(), os.path.expanduser("~/.ml_data/ResNet-18-STL.pt"))
+
+print("Model saved!")
 
