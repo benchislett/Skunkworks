@@ -1,40 +1,39 @@
-import torch, torchvision
+import torch
 import torch.nn.functional as F
-import numpy as np
-import os
 
-from model import ResNet18
 
-torch.cuda.set_device(0)
-torch.set_default_tensor_type("torch.cuda.FloatTensor")
+def test_batch(model, loss_fn, batch):
+    """Test the model on a batch of data,
+    and return the loss and number of correct predictions
 
-model = ResNet18(10).cuda()
-model.load_state_dict(torch.load(os.path.expanduser("~/.ml_data/ResNet-18-STL.pt")))
-
-model.eval()
-
-toTensor = torchvision.transforms.Compose([
-    torchvision.transforms.ToTensor(),
-    torchvision.transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-])
-
-batch_size=100
-
-dataset_test = torchvision.datasets.STL10(root="~/.ml_data", split="test", download=True, transform=toTensor)
-test_loader = torch.utils.data.DataLoader(dataset_test, batch_size=batch_size, shuffle=True)
-
-acc_total = 0
-acc_count = 0
-
-for i, batch in enumerate(test_loader):
+    """
     x, y = batch[0].cuda(), batch[1].cuda()
 
-    out = F.softmax(model(x), dim=-1)
-
+    out = model(x)
+    # out = F.softmax(out, dim=-1)
     _, pred = torch.max(out, 1)
 
-    acc_total += torch.sum(pred == y)
-    acc_count += batch_size
+    loss = loss_fn(out, y).item()
+    count = torch.sum(pred == y)
 
-print("Total accuracy: {}%".format(100 * acc_total / acc_count))
+    return loss, count
 
+
+def test(model, loss_fn, loader):
+    """Test the model over all batches in a given dataset,
+    and return the total mean loss and prediction accuracy
+
+    """
+    model.eval()
+
+    loss_acc = 0.0
+    count_acc = 0.0
+    batches = 0
+    for batch in loader:
+        loss, count = test_batch(model, loss_fn, batch)
+
+        loss_acc += loss
+        count_acc += count
+        batches += 1
+
+    return loss_acc / batches, count_acc / batches
