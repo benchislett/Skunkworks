@@ -1,6 +1,19 @@
 # projects
 
-Miscellaneous programming exercises and projects, sorted by language
+## What is this?
+
+This repository contains a collection of small side-projects I have written.
+These mini-projects are curated and maintained by myself, but not actively developed.
+None of these are meant to be long-term commitments, but rather small exercises to keep my skills sharp and/or learn a new language, library, or framework.
+
+## Why a monorepo?
+
+The mono-repository structure allows for many small projects to be collected in a single place, allowing for a much more maintainable experience: I can easily view and make changes to all of my projects for a single language, and review skills as necessary.
+
+Further, this many projects can clutter a github page and make it difficult to discern major from minor projects.
+So, all major projects (those that are under active development, make use of a licence, and/or allow community involvement) will have their own repository.
+
+## Project List
 
 - C
   - [Triangle Image Evolution](C/Triangle-Image-Evolution/) (`cairo`)
