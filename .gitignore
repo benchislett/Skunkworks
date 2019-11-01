@@ -23,5 +23,8 @@ tetris
 # C/Triangle-Image-Evolution executable
 generate
 
-# C/Langtons-Ant
+# C/Langtons-Ant executable
 simulate
+
+# Fortran/Solitaire executable
+solitaire
