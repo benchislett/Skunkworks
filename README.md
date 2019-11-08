@@ -29,3 +29,4 @@ So, all major projects (those that are under active development, make use of a l
   - [Split-Step Fourier Method NLSE solver](Python3/Split-Operator-Solver/)
   - [Video to Ascii converter](Python3/video2ascii/) (`curses`)
   - [ResNet-18 Implementation](Python3/ResNet-18/) (`PyTorch`)
+  - [Image Compression with Convolutional Autoencoders](Python3/Conv-Autoencoder/) (`PyTorch`)
