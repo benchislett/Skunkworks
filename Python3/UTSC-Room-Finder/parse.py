@@ -15,8 +15,7 @@ def get_availability_map(room_to_html: Dict[str, str]) -> Dict[str, Dict[str, st
         html = room_to_html[room]
         soup = BeautifulSoup(html, 'html.parser')
 
-        days = "Mon Tue Wed Thu Fri Sat Sun".split(' ')
-        for day in days:
+        for day in range(7):
             out_map[room][day] = []
             timeout = 0
             current_event = None
