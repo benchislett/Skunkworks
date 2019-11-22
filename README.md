@@ -3,15 +3,17 @@
 ## What is this?
 
 This repository contains a collection of small side-projects I have written.
-These mini-projects are curated and maintained by myself, but not actively developed.
-None of these are meant to be long-term commitments, but rather small exercises to keep my skills sharp and/or learn a new language, library, or framework.
+These mini-projects are curated and maintained by myself, but not all are under active development.
+None of these are meant to be long-term commitments, but rather small exercises to keep my skills sharp and/or learn a new language, framework, algorithm or technique, or just to solve a problem.
 
-## Why a monorepo?
+## Why only one repository?
 
-The mono-repository structure allows for many small projects to be collected in a single place, allowing for a much more maintainable experience: I can easily view and make changes to all of my projects for a single language, and review skills as necessary.
+The mono-repository structure allows for projects to be collected in one place, so they can be much more easily mantained over time.
 
-Further, this many projects can clutter a github page and make it difficult to discern major from minor projects.
-So, all major projects (those that are under active development, make use of a licence, and/or allow community involvement) will have their own repository.
+This many projects can really clutter a github page, and make it difficult to discern major from minor projects.
+Here, I can maintain an overview of my past minor projects, and dedicate an entire repository to major projects under active development/maintenance.
+
+The mono-repository structure allows for many projects to be collected in a single place, allowing for a much more maintainable experience: I can easily view and make changes to all of my projects for a single language, and review skills as necessary.
 
 ## Project List
 
