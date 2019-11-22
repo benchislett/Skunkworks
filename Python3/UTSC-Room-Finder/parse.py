@@ -9,7 +9,7 @@ def get_availability_map(room_to_html: Dict[str, str]) -> Dict[str, Dict[str, st
     Availability will either be "Empty", or the listed event.
     """
     out_map = {}
-    for room in {'BV-363': 12}:#room_to_html:
+    for room in room_to_html:
         out_map[room] = {}
 
         html = room_to_html[room]
