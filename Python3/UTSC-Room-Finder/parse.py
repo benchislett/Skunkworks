@@ -28,9 +28,7 @@ def get_availability_map(room_to_html: Dict[str, str]) -> Dict[str, Dict[str, st
                     out_map[room][day].append(current_event)
                 else:
                     item = contents[1].extract()
-                    print(item)
                     if item.has_attr('rowspan') and item['rowspan'] is not None:
-                        print(item['rowspan'])
                         timeout = int(item['rowspan']) - 1
                         current_event = item.get_text(separator=" ")
                         out_map[room][day].append(current_event)

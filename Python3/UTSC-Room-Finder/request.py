@@ -44,7 +44,6 @@ def get_rooms_html(date_str: str, buildings: List[str] = None) -> Dict[str, str]
     date_str = 'day=' + date_str
 
     req_str = '&'.join([LINK, room_str, date_str])
-    print(room_str, date_str, req_str)
     r = requests.get(req_str)
     # This small application can simply let request errors bubble up to the user
 
