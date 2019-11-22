@@ -9,9 +9,9 @@ def get_available_rooms(availability_map: Dict[str, Dict[int, List[str]]], day: 
                 length = 1
                 while availability_map[room][day][timeslot + length] == 'Empty':
                     length += 1
-                close_time = str((timeslot + length) // 2 + 8) + str(':00' if (timeslot + length) % 2 == 0 else ':30')
+                close_time = str((timeslot + length) // 2 + 8) + \
+                    str(':00' if (timeslot + length) % 2 == 0 else ':30')
                 rooms.append((room, close_time))
         except:
             pass
     return rooms
-

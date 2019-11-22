@@ -2,6 +2,7 @@ from typing import List, Dict
 from bs4 import BeautifulSoup
 import datetime
 
+
 def get_availability_map(room_to_html: Dict[str, str]) -> Dict[str, Dict[str, str]]:
     """Return a dictionary containing mappings from room names
     to a dictionary of days to list of strings representing availability at given times,
