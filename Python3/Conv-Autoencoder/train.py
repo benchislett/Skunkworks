@@ -5,10 +5,10 @@ def train_batch(model, loss_fn, optimizer, batch):
     """
     optimizer.zero_grad()
 
-    x, y = batch[0].cuda(), batch[1].cuda()
+    x = batch[0].cuda()
 
     pred = model(x)
-    loss_batch = loss_fn(pred, y)
+    loss_batch = loss_fn(pred, x)
     loss_batch.backward()
     optimizer.step()
 
