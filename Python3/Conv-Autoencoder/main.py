@@ -10,7 +10,7 @@ from model import CAE
 from test import test
 from train import train
 
-batch_size = 8
+batch_size = 128
 num_epochs = 8
 
 attr_names, train_loader, test_loader, val_loader = get_celeba_loaders(
