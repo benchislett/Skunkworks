@@ -1,4 +1,5 @@
 import torch
+import torchvision
 import torchvision.datasets as datasets
 
 
@@ -8,9 +9,13 @@ def get_celeba_loaders(root='~/.ml_data', batch_size=64, num_workers=2):
     CelebA dataset from torchvision.
     """
 
-    train_dset = datasets.CelebA(root, split='train', download=True)
-    test_dset = datasets.CelebA(root, split='test', download=True)
-    val_dset = datasets.CelebA(root, split='valid', download=True)
+    toTensor = torchvision.transforms.ToTensor()
+    train_dset = datasets.CelebA(
+        root, split='train', download=True, transform=toTensor)
+    test_dset = datasets.CelebA(
+        root, split='test', download=True, transform=toTensor)
+    val_dset = datasets.CelebA(
+        root, split='valid', download=True, transform=toTensor)
 
     train_loader = torch.utils.data.DataLoader(train_dset,
                                                batch_size=batch_size,
