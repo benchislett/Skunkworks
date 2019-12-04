@@ -15,7 +15,7 @@ def train_batch(model, loss_fn, optimizer, batch):
     return loss_batch.item()
 
 
-def train(model, loss_fn, optimizer, loader):
+def train(model, loss_fn, optimizer, loader, logger):
     """Train the model over all batches in a given dataset,
     and return the total loss
 
@@ -24,8 +24,10 @@ def train(model, loss_fn, optimizer, loader):
 
     loss_acc = 0.0
     batches = 0
-    for batch in loader:
+    for idx, batch in enumerate(loader):
         loss = train_batch(model, loss_fn, optimizer, batch)
+
+        logger.batch(idx, loss)
 
         loss_acc += loss
         batches += 1

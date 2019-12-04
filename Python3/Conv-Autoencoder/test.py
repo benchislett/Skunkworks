@@ -1,6 +1,3 @@
-import torch
-
-
 def test_batch(model, loss_fn, batch):
     """Test the model on a batch of data,
     and return the loss and number of correct predictions
