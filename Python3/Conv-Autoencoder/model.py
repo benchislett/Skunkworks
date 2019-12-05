@@ -37,7 +37,8 @@ class CAE(nn.Module):
         x = F.relu(self.conv4(x))
         x = F.relu(self.conv5(x))
         x = F.relu(self.conv6(x))
-        x = torch.sigmoid(self.linear_in(x.view(-1, self.imgsize // 4)))
+        x = x.view(-1, self.imgsize // 4)
+        x = F.sigmoid(self.linear_in(x))
         return x
 
     def decode(self, x):
@@ -47,7 +48,7 @@ class CAE(nn.Module):
         x = F.relu(self.deconv3(x))
         x = F.relu(self.deconv4(x))
         x = F.relu(self.deconv5(x))
-        x = torch.sigmoid(self.deconv6(x))
+        x = F.sigmoid(self.deconv6(x))
         return x
 
     def forward(self, x):
