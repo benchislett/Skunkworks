@@ -9,26 +9,26 @@ class CAE(nn.Module):
 
         self.w = width
         self.h = height
-        self.imgsize = width * height * 3
+        self.imgsize = width * height
         self.code_bits = code_bits
 
         # Encoder
-        self.conv1 = nn.Conv2d(3, 8, 3, padding=1, stride=1)
-        self.conv2 = nn.Conv2d(8, 16, 3, padding=1, stride=2)
-        self.conv3 = nn.Conv2d(16, 24, 3, padding=1, stride=1)
-        self.conv4 = nn.Conv2d(24, 16, 3, padding=1, stride=1)
-        self.conv5 = nn.Conv2d(16, 8, 3, padding=1, stride=1)
-        self.conv6 = nn.Conv2d(8, 3, 3, padding=1, stride=1)
-        self.linear_in = nn.Linear(self.imgsize // 4, code_bits)
+        self.conv1 = nn.Conv2d(3, 16, 3, padding=1, stride=1)
+        self.conv2 = nn.Conv2d(16, 16, 3, padding=1, stride=2)
+        self.conv3 = nn.Conv2d(16, 16, 3, padding=1, stride=1)
+        self.conv4 = nn.Conv2d(16, 16, 3, padding=1, stride=1)
+        self.conv5 = nn.Conv2d(16, 16, 3, padding=1, stride=1)
+        self.conv6 = nn.Conv2d(16, 3, 3, padding=1, stride=1)
+        self.linear_in = nn.Linear(3 * self.imgsize // 4, code_bits)
 
         # Decoder
-        self.linear_out = nn.Linear(code_bits, self.imgsize // 4)
-        self.deconv1 = nn.ConvTranspose2d(3, 8, 3, padding=1, stride=1)
-        self.deconv2 = nn.ConvTranspose2d(8, 16, 3, padding=1, stride=1)
-        self.deconv3 = nn.ConvTranspose2d(16, 24, 3, padding=1, stride=1)
-        self.deconv4 = nn.ConvTranspose2d(24, 16, 3, padding=1, stride=1)
-        self.deconv5 = nn.ConvTranspose2d(16, 8, 4, padding=1, stride=2)
-        self.deconv6 = nn.ConvTranspose2d(8, 3, 3, padding=1, stride=1)
+        self.linear_out = nn.Linear(code_bits, 3 * self.imgsize // 4)
+        self.deconv1 = nn.ConvTranspose2d(3, 16, 3, padding=1, stride=1)
+        self.deconv2 = nn.ConvTranspose2d(16, 16, 3, padding=1, stride=1)
+        self.deconv3 = nn.ConvTranspose2d(16, 16, 3, padding=1, stride=1)
+        self.deconv4 = nn.ConvTranspose2d(16, 16, 3, padding=1, stride=1)
+        self.deconv5 = nn.ConvTranspose2d(16, 16, 4, padding=1, stride=2)
+        self.deconv6 = nn.ConvTranspose2d(16, 3, 3, padding=1, stride=1)
 
     def encode(self, x):
         x = F.relu(self.conv1(x))
@@ -37,7 +37,7 @@ class CAE(nn.Module):
         x = F.relu(self.conv4(x))
         x = F.relu(self.conv5(x))
         x = F.relu(self.conv6(x))
-        x = x.view(-1, self.imgsize // 4)
+        x = x.view(-1, 3 * self.imgsize // 4)
         x = F.sigmoid(self.linear_in(x))
         return x
 

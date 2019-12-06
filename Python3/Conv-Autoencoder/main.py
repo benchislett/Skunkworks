@@ -11,7 +11,7 @@ torch.cuda.set_device(0)
 torch.set_default_tensor_type('torch.cuda.FloatTensor')
 
 
-batch_size = 128
+batch_size = 64
 num_epochs = 32
 
 attr_names, train_loader, test_loader, val_loader = get_celeba_loaders(
@@ -21,7 +21,7 @@ train_logger = Logger(len(train_loader))
 model = CAE(code_bits=2048, width=218, height=178).to('cuda:0')
 
 loss = torch.nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=0.1, weight_decay=0.00001)
+optimizer = torch.optim.Adam(model.parameters(), lr=0.001, weight_decay=0.00001)
 
 for epoch in range(num_epochs):
     epoch_loss = train(model, loss, optimizer, train_loader, train_logger)
