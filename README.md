@@ -33,3 +33,5 @@ The mono-repository structure allows for many projects to be collected in a sing
   - [ResNet-18 Implementation](Python3/ResNet-18/) (`PyTorch`)
   - [Image Compression with Convolutional Autoencoders](Python3/Conv-Autoencoder/) (`PyTorch`)
   - [UTSC Available Room Finder](Python3/UTSC-Room-Finder/) (`requests`)
+  - [Noise Algorithms](Python3/Noise/) (`numpy`, `matplotlib`)
+
