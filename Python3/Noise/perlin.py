@@ -77,7 +77,7 @@ def perlin_noise(res, boxes):
 
     noise = merge_vecs(dotted_vecs, weights)
 
-    return scale(noise, -1, 1)
+    return noise
 
 
 def fractal_noise(res, boxes, octaves=5, decay=0.5):
@@ -112,6 +112,7 @@ if __name__ == '__main__':
     boxes = [args.grid, args.grid, args.grid]
 
     noise = fractal_noise(res, boxes)
+    noise = scale(noise, -1, 1)
 
     if args.plot:
         plt.imshow(noise[0], cmap='gray')
@@ -119,9 +120,7 @@ if __name__ == '__main__':
         plt.show()
 
     if args.render:
-        images = [((arr + 1) * 127.5).astype(np.uint8) for arr in noise]
+        images = [scale(noise, 0, 255).astype(np.uint8) for arr in noise]
         images = [Image.fromarray(arr) for arr in images]
         images[0].save('output/noise_anim.gif', save_all=True, append_images=images[1:], loop=0)
 
-    
-    
