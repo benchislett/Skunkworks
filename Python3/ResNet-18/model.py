@@ -1,10 +1,13 @@
 import torch
 
+
 def Conv2d(in_channels, out_channels, kernel_size, stride=1, padding=1):
-    out = torch.nn.Conv2d(in_channels, out_channels, kernel_size=kernel_size, stride=stride, padding=padding)
+    out = torch.nn.Conv2d(in_channels, out_channels,
+                          kernel_size=kernel_size, stride=stride, padding=padding)
     torch.nn.init.kaiming_normal_(out.weight, mode='fan_out',
                                   nonlinearity='relu')
     return out
+
 
 def BatchNorm2d(size):
     out = torch.nn.BatchNorm2d(size)
@@ -13,6 +16,7 @@ def BatchNorm2d(size):
     torch.nn.init.constant_(out.bias, 0)
 
     return out
+
 
 class ResBlock(torch.nn.Module):
 
@@ -24,7 +28,7 @@ class ResBlock(torch.nn.Module):
         self.conv1 = Conv2d(in_channels, out_channels,
                             kernel_size=3, stride=stride)
         self.bn1 = BatchNorm2d(out_channels)
-        
+
         self.conv2 = Conv2d(out_channels, out_channels,
                             kernel_size=3, stride=1)
         self.bn2 = BatchNorm2d(out_channels)
@@ -40,7 +44,7 @@ class ResBlock(torch.nn.Module):
 
         out = self.conv2(out)
         out = self.bn2(out)
-        
+
         shortcut = self.shortcut_norm(self.shortcut(x))
 
         out += shortcut
@@ -48,6 +52,7 @@ class ResBlock(torch.nn.Module):
         out = self.activate(out)
 
         return out
+
 
 class ResLayer(torch.nn.Module):
 
@@ -62,6 +67,7 @@ class ResLayer(torch.nn.Module):
         for block in self.blocks:
             x = block(x)
         return x
+
 
 class ResNet18(torch.nn.Module):
 
@@ -99,8 +105,7 @@ class ResNet18(torch.nn.Module):
 
         x = self.avgpool(x)
         x = torch.flatten(x, 1)
-        
+
         x = self.fc(x)
 
         return x
-
