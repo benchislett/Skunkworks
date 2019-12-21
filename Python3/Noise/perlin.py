@@ -2,6 +2,7 @@ import numpy as np
 import itertools
 from operator import sub
 
+
 def fade(t):
     return 6 * t ** 5 - 15 * t ** 4 + 10 * t ** 3
 
@@ -21,9 +22,10 @@ def scale(x, new_min, new_max):
 def scale_ndarray(x, new_shape):
     factors = tuple(i // j for (i, j) in zip(new_shape, x.shape))
     y = np.zeros(new_shape)
-    
+
     for slice_starts in itertools.product(*(range(i) for i in factors)):
-        slices = tuple(slice(i, j, k) for (i, j, k) in zip(slice_starts, new_shape, factors))
+        slices = tuple(slice(i, j, k)
+                       for (i, j, k) in zip(slice_starts, new_shape, factors))
         y[slices] = x
 
     return y
@@ -65,12 +67,13 @@ def perlin_noise(res, boxes):
     grid = np.moveaxis(np.mgrid[indexes], 0, -1)
     grid_boxes = grid // box_sizes
     grid_fracs = (grid / box_sizes) % 1
-    
+
     weights = np.moveaxis(fade(grid_fracs), -1, 0)
 
     dotted_vecs = []
     for diff in itertools.product((0, 1), repeat=n):
-        indexes = tuple(slice(i, j) for (i, j) in zip(diff, tuple(map(lambda x, y: x - (1 - y), gradients.shape, diff))))
+        indexes = tuple(slice(i, j) for (i, j) in zip(diff, tuple(
+            map(lambda x, y: x - (1 - y), gradients.shape, diff))))
         grads = scale_ndarray(gradients[indexes], grid.shape)
         dists = grid_fracs - diff
         dotted_vecs.append(np.einsum('...k,...k->...', grads, dists))
@@ -99,13 +102,20 @@ if __name__ == '__main__':
     from PIL import Image
     import argparse
 
-    parser = argparse.ArgumentParser(description='View or animate a perlin noise image.')
-    parser.add_argument('--res', type=int, default=256, help='Image resolution')
-    parser.add_argument('--grid', type=int, default=4, help='Grid resolution. Should be a factor of res.')
-    parser.add_argument('--frames', type=int, default=8, help='Number of frames to use when animating.')
-    parser.add_argument('--plot', action='store_true', help='Plot the first frame with matplotlib at runtime.')
-    parser.add_argument('--render', action='store_false', help='Render a gif animation over the noise.')
-    parser.add_argument('--fractal', type=int, default=0, help='Use fractal noise with specified number of octaves.')
+    parser = argparse.ArgumentParser(
+        description='View or animate a perlin noise image.')
+    parser.add_argument('--res', type=int, default=256,
+                        help='Image resolution')
+    parser.add_argument('--grid', type=int, default=4,
+                        help='Grid resolution. Should be a factor of res.')
+    parser.add_argument('--frames', type=int, default=8,
+                        help='Number of frames to use when animating.')
+    parser.add_argument('--plot', action='store_true',
+                        help='Plot the first frame with matplotlib at runtime.')
+    parser.add_argument('--render', action='store_false',
+                        help='Render a gif animation over the noise.')
+    parser.add_argument('--fractal', type=int, default=0,
+                        help='Use fractal noise with specified number of octaves.')
 
     args = parser.parse_args()
 
@@ -127,5 +137,5 @@ if __name__ == '__main__':
     if args.render:
         images = [scale(arr, 0, 255).astype(np.uint8) for arr in noise]
         images = [Image.fromarray(arr) for arr in images]
-        images[0].save('output/noise_anim.gif', save_all=True, append_images=images[1:], loop=0)
-
+        images[0].save('output/noise_anim.gif', save_all=True,
+                       append_images=images[1:], loop=0)
