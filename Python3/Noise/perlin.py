@@ -52,6 +52,13 @@ def perlin_noise(res, boxes):
     gradients = np.random.normal(size=grad_dims)
     gradients /= np.linalg.norm(gradients, axis=-1, keepdims=True)
 
+    for i in range(n):
+        in_idxs = [slice(None) for _ in range(n)]
+        out_idxs = in_idxs.copy()
+        in_idxs[i] = -1
+        out_idxs[i] = 0
+        gradients[tuple(in_idxs)] = gradients[tuple(out_idxs)]
+
     noise = np.zeros(res)
 
     indexes = tuple(slice(0, i) for i in dims)
@@ -79,6 +86,8 @@ if __name__ == '__main__':
     res = [256, 256]
     boxes = [4, 4]
     noise = perlin_noise(res, boxes)
+    noise = np.hstack((noise, noise))
+    noise = np.vstack((noise, noise))
 
     plt.imshow(noise, cmap='gray')
     plt.colorbar()
