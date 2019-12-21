@@ -73,7 +73,7 @@ def perlin_noise(res, boxes):
         indexes = tuple(slice(i, j) for (i, j) in zip(diff, tuple(map(lambda x, y: x - (1 - y), gradients.shape, diff))))
         grads = scale_ndarray(gradients[indexes], grid.shape)
         dists = grid_fracs - diff
-        dotted_vecs.append(np.einsum('ijk,ijk->ij', grads, dists))
+        dotted_vecs.append(np.einsum('...k,...k->...', grads, dists))
 
     noise = merge_vecs(dotted_vecs, weights)
 
@@ -82,13 +82,32 @@ def perlin_noise(res, boxes):
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
+    from PIL import Image
+    import argparse
 
-    res = [256, 256]
-    boxes = [4, 4]
+    parser = argparse.ArgumentParser(description='View or animate a perlin noise image.')
+    parser.add_argument('--res', type=int, default=256, help='Image resolution')
+    parser.add_argument('--grid', type=int, default=4, help='Grid resolution. Should be a factor of res.')
+    parser.add_argument('--frames', type=int, default=24, help='Number of frames to use when animating.')
+    parser.add_argument('--plot', action='store_true', help='Plot the first frame with matplotlib at runtime.')
+    parser.add_argument('--render', action='store_false', help='Render a gif animation over the noise.')
+
+    args = parser.parse_args()
+
+    res = [args.frames, args.res, args.res]
+    boxes = [args.grid, args.grid, args.grid]
+
     noise = perlin_noise(res, boxes)
-    noise = np.hstack((noise, noise))
-    noise = np.vstack((noise, noise))
 
-    plt.imshow(noise, cmap='gray')
-    plt.colorbar()
-    plt.show()
+    if args.plot:
+        plt.imshow(noise[0], cmap='gray')
+        plt.colorbar()
+        plt.show()
+
+    if args.render:
+        images = [((arr + 1) * 127.5).astype(np.uint8) for arr in noise]
+        images = [Image.fromarray(arr) for arr in images]
+        images[0].save('output/noise_anim.gif', save_all=True, append_images=images[1:], loop=0)
+
+    
+    
