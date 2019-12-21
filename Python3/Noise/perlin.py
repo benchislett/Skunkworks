@@ -102,16 +102,21 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='View or animate a perlin noise image.')
     parser.add_argument('--res', type=int, default=256, help='Image resolution')
     parser.add_argument('--grid', type=int, default=4, help='Grid resolution. Should be a factor of res.')
-    parser.add_argument('--frames', type=int, default=64, help='Number of frames to use when animating.')
+    parser.add_argument('--frames', type=int, default=8, help='Number of frames to use when animating.')
     parser.add_argument('--plot', action='store_true', help='Plot the first frame with matplotlib at runtime.')
     parser.add_argument('--render', action='store_false', help='Render a gif animation over the noise.')
+    parser.add_argument('--fractal', type=int, default=0, help='Use fractal noise with specified number of octaves.')
 
     args = parser.parse_args()
 
     res = [args.frames, args.res, args.res]
     boxes = [args.grid, args.grid, args.grid]
 
-    noise = fractal_noise(res, boxes)
+    if args.fractal > 0:
+        noise = fractal_noise(res, boxes, args.fractal)
+    else:
+        noise = perlin_noise(res, boxes)
+
     noise = scale(noise, -1, 1)
 
     if args.plot:
@@ -120,7 +125,7 @@ if __name__ == '__main__':
         plt.show()
 
     if args.render:
-        images = [scale(noise, 0, 255).astype(np.uint8) for arr in noise]
+        images = [scale(arr, 0, 255).astype(np.uint8) for arr in noise]
         images = [Image.fromarray(arr) for arr in images]
         images[0].save('output/noise_anim.gif', save_all=True, append_images=images[1:], loop=0)
 
