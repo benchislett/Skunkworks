@@ -112,14 +112,14 @@ if __name__ == '__main__':
                         help='Number of frames to use when animating.')
     parser.add_argument('--plot', action='store_true',
                         help='Plot the first frame with matplotlib at runtime.')
-    parser.add_argument('--render', action='store_false',
+    parser.add_argument('--render', action='store_true',
                         help='Render a gif animation over the noise.')
     parser.add_argument('--fractal', type=int, default=0,
                         help='Use fractal noise with specified number of octaves.')
 
     args = parser.parse_args()
 
-    res = [args.frames, args.res, args.res]
+    res = [max(args.frames, args.grid), args.res, args.res]
     boxes = [args.grid, args.grid, args.grid]
 
     if args.fractal > 0:
@@ -138,4 +138,4 @@ if __name__ == '__main__':
         images = [scale(arr, 0, 255).astype(np.uint8) for arr in noise]
         images = [Image.fromarray(arr) for arr in images]
         images[0].save('output/noise_anim.gif', save_all=True,
-                       append_images=images[1:], loop=0)
+                       append_images=images[1:args.frames], loop=0)
