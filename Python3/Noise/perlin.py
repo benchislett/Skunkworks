@@ -80,6 +80,20 @@ def perlin_noise(res, boxes):
     return scale(noise, -1, 1)
 
 
+def fractal_noise(res, boxes, octaves=5, decay=0.5):
+    noise = np.zeros(res)
+    weight = 1
+
+    for i in range(octaves):
+        if np.count_nonzero([(i / j) % 1 for (i, j) in zip(res, boxes)]) > 0:
+            break
+        noise += weight * perlin_noise(res, boxes)
+        boxes = [2 * j for j in boxes]
+        weight *= decay
+
+    return noise
+
+
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
     from PIL import Image
@@ -88,7 +102,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='View or animate a perlin noise image.')
     parser.add_argument('--res', type=int, default=256, help='Image resolution')
     parser.add_argument('--grid', type=int, default=4, help='Grid resolution. Should be a factor of res.')
-    parser.add_argument('--frames', type=int, default=24, help='Number of frames to use when animating.')
+    parser.add_argument('--frames', type=int, default=64, help='Number of frames to use when animating.')
     parser.add_argument('--plot', action='store_true', help='Plot the first frame with matplotlib at runtime.')
     parser.add_argument('--render', action='store_false', help='Render a gif animation over the noise.')
 
@@ -97,7 +111,7 @@ if __name__ == '__main__':
     res = [args.frames, args.res, args.res]
     boxes = [args.grid, args.grid, args.grid]
 
-    noise = perlin_noise(res, boxes)
+    noise = fractal_noise(res, boxes)
 
     if args.plot:
         plt.imshow(noise[0], cmap='gray')
