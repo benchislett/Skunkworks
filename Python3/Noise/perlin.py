@@ -51,9 +51,11 @@ def perlin_noise(res, boxes):
 
     grad_dims = tuple(boxes + 1) + (n,)
 
+    # Compute random gradients on an n-sphere
     gradients = np.random.normal(size=grad_dims)
     gradients /= np.linalg.norm(gradients, axis=-1, keepdims=True)
 
+    # Copy gradients at edges for tiling/looping
     for i in range(n):
         in_idxs = [slice(None) for _ in range(n)]
         out_idxs = in_idxs.copy()
@@ -76,6 +78,7 @@ def perlin_noise(res, boxes):
             map(lambda x, y: x - (1 - y), gradients.shape, diff))))
         grads = scale_ndarray(gradients[indexes], grid.shape)
         dists = grid_fracs - diff
+        # Compute dot products of corresponding gradient and distance vectors
         dotted_vecs.append(np.einsum('...k,...k->...', grads, dists))
 
     noise = merge_vecs(dotted_vecs, weights)
