@@ -1,19 +1,22 @@
 module RayOps
   using LinearAlgebra
+  using StaticArrays
 
-  const white = Vector{Float32}([1.0, 1.0, 1.0])
-  const blue = Vector{Float32}([0.5, 0.7, 1.0])
+  Vec3 = SVector{3, Float32}
+
+  const white = Vec3([1.0, 1.0, 1.0])
+  const blue = Vec3([0.5, 0.7, 1.0])
 
   struct ray
-    from::Vector{Float32}
-    to::Vector{Float32}
+    from::Vec3
+    to::Vec3
   end
 
   function ray_at(r::ray, t::Float32)
     return r.from .+ t .* r.to
   end
 
-  function background(v::Vector{Float32})
+  function background(v::Vec3)
     y = normalize(v)[2]
     t = 0.5 * (y + 1)
     return ((1 - t) .* white) .+ (t .* blue)
@@ -23,6 +26,7 @@ module RayOps
     background(r.to)
   end
 
+  export Vec3
   export ray, ray_at
   export get_color
 end
