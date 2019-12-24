@@ -21,7 +21,7 @@ function main()
     end
   end
 
-  save("./output.png", colorview(RGB, img))
+  save("output/output.png", colorview(RGB, img))
 end
 
 main()
