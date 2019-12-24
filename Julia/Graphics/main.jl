@@ -16,7 +16,7 @@ function main()
     for i in 1:w
       u = i / w
       v = j / h
-      r = ray(origin, window_bottom_left .+ (u .* window_width) .+ (v .* window_height))
+      r = Ray(origin, window_bottom_left .+ (u .* window_width) .+ (v .* window_height))
       img[:, j, i] = get_color(r)
     end
   end
