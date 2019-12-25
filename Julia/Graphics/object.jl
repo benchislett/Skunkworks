@@ -1,7 +1,7 @@
 module Objects
+  using ..RayDef
 
-  include("ray.jl")
-  using .RayOps
+  using IntervalSets
 
   struct HitRecord
     time::Float32
@@ -9,7 +9,7 @@ module Objects
     normal::Vec3
   end
 
-  HitRecord() = HitRecord(0.0, Vec3(), Vec3())
+  HitRecord() = HitRecord(0, Vec3(0, 0, 0), Vec3(0, 0, 0))
 
   abstract type Object end
 
