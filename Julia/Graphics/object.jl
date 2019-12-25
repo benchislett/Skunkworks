@@ -2,8 +2,9 @@ module Objects
   using ..RayDef
 
   using IntervalSets
+  using LinearAlgebra
 
-  struct HitRecord
+  mutable struct HitRecord
     time::Float32
     point::Vec3
     normal::Vec3
@@ -47,4 +48,23 @@ module Objects
     end
   end
 
+  ObjectSet = Set{Object}
+
+  function hit(r::Ray, o::ObjectSet, t::ClosedInterval{Float32})
+    record = HitRecord()
+    any_hits = false
+    closest = t.right
+    for obj in o
+      did_hit, temp_record = hit(r, obj, ClosedInterval{Float32}(t.left, closest))
+      if did_hit
+        any_hits = true
+        record = temp_record
+        closest = record.time
+      end
+    end
+    return any_hits, record
+  end
+
+  export Object, ObjectSet, Sphere
+  export HitRecord, hit
 end
