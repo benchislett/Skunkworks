@@ -14,6 +14,7 @@ include("camera.jl")
 using .CameraDef
 
 using Images
+using ProgressMeter
 
 function main()
   w, h = 200, 100
@@ -29,7 +30,7 @@ function main()
   
   world = ObjectSet([sphere1, sphere2, sphere3, sphere4])
 
-  for j in h:-1:1
+  @showprogress 1 "Rendering..." for j in h:-1:1
     for i in 1:w
       color = Vec3(0, 0, 0)
       for _ in 1:samples
