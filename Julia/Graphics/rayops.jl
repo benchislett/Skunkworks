@@ -15,10 +15,19 @@ module RayOps
     return ((1 - t) .* white) .+ (t .* blue)
   end
 
+  function random_unit_sphere()
+    p = Vec3(5, 5, 5)
+    while norm(p) >= 1
+      p = 2 .* Vec3(rand(), rand(), rand()) .- 1
+    end
+    return p
+  end
+
   function get_color(r::Ray, world::ObjectSet)
-    did_hit, record = hit(r, world, ClosedInterval{Float32}(0.0f0, Inf32))
+    did_hit, record = hit(r, world, ClosedInterval{Float32}(0.01f0, Inf32))
     if did_hit
-      return 0.5 * (record.normal .+ 1)
+      rand_target = record.point + record.normal + random_unit_sphere()
+      return 0.5 * get_color(Ray(record.point, rand_target - record.point), world)
     else
       return background(r.to)
     end

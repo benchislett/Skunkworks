@@ -35,7 +35,7 @@ function main()
         c = get_color(r, world)
         color += c
       end
-      img[:, h - j + 1, i] = color / samples
+      img[:, h - j + 1, i] = sqrt.(color / samples)
     end
   end
 
