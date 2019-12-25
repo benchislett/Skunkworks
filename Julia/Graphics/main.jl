@@ -1,6 +1,9 @@
 include("ray.jl")
 using .RayDef
 
+include("material.jl")
+using .Materials
+
 include("object.jl")
 using .Objects
 
@@ -19,8 +22,8 @@ function main()
 
   cam = Camera()
 
-  sphere1 = Sphere(Vec3(0, -100.5, -1), 100)
-  sphere2 = Sphere(Vec3(0, 0, -1), 0.5)
+  sphere1 = Sphere(Vec3(0, -100.5, -1), 100, Diffuse(Vec3(0.8, 0.8, 0.0)))
+  sphere2 = Sphere(Vec3(0, 0, -1), 0.5, Diffuse(Vec3(1.0, 0.0, 1.0)))
   
   world = ObjectSet([sphere1, sphere2])
 

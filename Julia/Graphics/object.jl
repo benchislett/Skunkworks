@@ -1,22 +1,16 @@
 module Objects
   using ..RayDef
+  using ..Materials
 
   using IntervalSets
   using LinearAlgebra
-
-  mutable struct HitRecord
-    time::Float32
-    point::Vec3
-    normal::Vec3
-  end
-
-  HitRecord() = HitRecord(0, Vec3(0, 0, 0), Vec3(0, 0, 0))
 
   abstract type Object end
 
   struct Sphere <: Object
     center::Vec3
     radius::Float32
+    material::Material
   end
 
   function hit(r::Ray, s::Sphere, t::ClosedInterval{Float32})
@@ -41,6 +35,7 @@ module Objects
         record.time = min(t1, t2)
         record.point = ray_at(r, record.time)
         record.normal = (record.point - s.center) / s.radius
+        record.material = s.material
         return true, record
       else
         return false, record
@@ -66,5 +61,5 @@ module Objects
   end
 
   export Object, ObjectSet, Sphere
-  export HitRecord, hit
+  export hit
 end
