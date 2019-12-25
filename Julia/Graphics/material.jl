@@ -34,7 +34,25 @@ module Materials
     return (true, scattered, attenuation)
   end
 
+  struct Metal <: Material
+    albedo::Vec3
+    fuzz::Float32
+    Metal(a::Vec3, f::Float32) = new(a, min(1.0f0, f))
+  end
+
+  function reflect(v::Vec3, n::Vec3)
+    return v - 2 * dot(v, n) * n
+  end
+
+  function scatter(mat::Metal, r::Ray, record::HitRecord)
+    reflected = reflect(normalize(r.to), record.normal)
+    scattered = Ray(record.point, reflected + mat.fuzz * random_unit_sphere())
+    attenuation = mat.albedo
+    did_scatter = dot(scattered.to, record.normal) > 0
+    return (did_scatter, scattered, attenuation)
+  end
+
   export HitRecord
-  export Material, Diffuse
+  export Material, Diffuse, Metal
   export scatter
 end

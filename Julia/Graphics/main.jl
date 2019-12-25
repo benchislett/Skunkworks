@@ -24,8 +24,10 @@ function main()
 
   sphere1 = Sphere(Vec3(0, -100.5, -1), 100, Diffuse(Vec3(0.8, 0.8, 0.0)))
   sphere2 = Sphere(Vec3(0, 0, -1), 0.5, Diffuse(Vec3(1.0, 0.0, 1.0)))
+  sphere3 = Sphere(Vec3(1, 0, -1), 0.5, Metal(Vec3(0.8, 0.6, 0.2), 0.3f0))
+  sphere4 = Sphere(Vec3(-1, 0, -1), 0.5, Metal(Vec3(0.8, 0.8, 0.8), 1.0f0))
   
-  world = ObjectSet([sphere1, sphere2])
+  world = ObjectSet([sphere1, sphere2, sphere3, sphere4])
 
   for j in h:-1:1
     for i in 1:w
