@@ -18,15 +18,16 @@ using ProgressMeter
 
 function main()
   w, h = 200, 100
-  samples = 250
+  samples = 25
   img = zeros(Float32, 3, h, w)
 
   cam = Camera()
 
-  sphere1 = Sphere(Vec3(0, -100.5, -1), 100, Diffuse(Vec3(0.8, 0.8, 0.0)))
-  sphere2 = Sphere(Vec3(0, 0, -1), 0.5, Diffuse(Vec3(1.0, 0.0, 1.0)))
+  sphere1 = Sphere(Vec3(0, 0, -1), 0.5, Diffuse(Vec3(0.1, 0.2, 0.5)))
+  sphere2 = Sphere(Vec3(0, -100.5, -1), 100, Diffuse(Vec3(0.8, 0.8, 0.0)))
   sphere3 = Sphere(Vec3(1, 0, -1), 0.5, Metal(Vec3(0.8, 0.6, 0.2), 0.3f0))
-  sphere4 = Sphere(Vec3(-1, 0, -1), 0.5, Metal(Vec3(0.8, 0.8, 0.8), 1.0f0))
+  sphere4 = Sphere(Vec3(-1, 0, -1), 0.5, Dielectric(1.5f0))
+  #sphere5 = Sphere(Vec3(-1, 0, -1), -0.45, Dielectric(1.5f0))
   
   world = ObjectSet([sphere1, sphere2, sphere3, sphere4])
 

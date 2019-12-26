@@ -52,7 +52,61 @@ module Materials
     return (did_scatter, scattered, attenuation)
   end
 
+  function refract(v::Vec3, n::Vec3, ni_over_nt::Float32)
+    unit_v = normalize(v)
+    dt = dot(unit_v, n)
+    discriminant = 1.0f0 - (ni_over_nt*ni_over_nt) * (1 - (dt*dt))
+    if (discriminant > 0)
+      refracted = ni_over_nt * (unit_v - n * dt) - n * sqrt(discriminant)
+      return (true, refracted)
+    else
+      return (false, Vec3(0, 0, 0))
+    end
+  end
+
+  function schlick(cos::Float32, refraction_index::Float32)
+    r0 = (1 - refraction_index) / (1 + refraction_index)
+    r0 = r0 * r0
+    return r0 + (1 - r0) * ((1 - cos)^5)
+  end
+
+  struct Dielectric <: Material
+    refraction_index::Float32
+  end
+
+  function scatter(mat::Dielectric, r::Ray, record::HitRecord)
+    reflected = reflect(r.to, record.normal)
+    attenuation = Vec3(1, 1, 1)
+    
+    if dot(r.to, record.normal) > 0
+      outward_normal = -record.normal
+      ni_over_nt = mat.refraction_index
+      cos = dot(r.to, record.normal) / norm(r.to)
+      cos = sqrt(1 - mat.refraction_index * mat.refraction_index * (1 - cos * cos))
+    else
+      outward_normal = record.normal
+      ni_over_nt = 1.0f0 / mat.refraction_index
+      cos = -dot(r.to, record.normal) / norm(r.to)
+    end
+
+    did_refract, refracted = refract(r.to, outward_normal, ni_over_nt)
+    if did_refract
+      reflect_prob = schlick(cos, mat.refraction_index)
+    else
+      reflect_prob = 1.0f0
+    end
+
+    if rand() < reflect_prob
+      scattered = Ray(record.point, reflected)
+    else
+      scattered = Ray(record.point, refracted)
+    end
+
+    return (true, scattered, attenuation)
+  end
+
   export HitRecord
-  export Material, Diffuse, Metal
+  export Material, Diffuse, Metal, Dielectric
   export scatter
 end
+
