@@ -81,8 +81,7 @@ module Materials
     if dot(r.to, record.normal) > 0
       outward_normal = -record.normal
       ni_over_nt = mat.refraction_index
-      cos = dot(r.to, record.normal) / norm(r.to)
-      cos = sqrt(1 - mat.refraction_index * mat.refraction_index * (1 - cos * cos))
+      cos = mat.refraction_index * dot(r.to, record.normal) / norm(r.to)
     else
       outward_normal = record.normal
       ni_over_nt = 1.0f0 / mat.refraction_index
