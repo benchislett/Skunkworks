@@ -17,19 +17,19 @@ using Images
 using ProgressMeter
 
 function main()
-  w, h = 200, 100
-  samples = 25
+  w, h = 400, 200
+  samples = 500
   img = zeros(Float32, 3, h, w)
 
-  cam = Camera()
+  cam = Camera(Vec3(-2, 2, 1), Vec3(0, -0.175, -1), Vec3(0, 1, 0), Float32(pi/5.75), Float32(w / h))
 
   sphere1 = Sphere(Vec3(0, 0, -1), 0.5, Diffuse(Vec3(0.1, 0.2, 0.5)))
   sphere2 = Sphere(Vec3(0, -100.5, -1), 100, Diffuse(Vec3(0.8, 0.8, 0.0)))
   sphere3 = Sphere(Vec3(1, 0, -1), 0.5, Metal(Vec3(0.8, 0.6, 0.2), 0.3f0))
   sphere4 = Sphere(Vec3(-1, 0, -1), 0.5, Dielectric(1.5f0))
-  #sphere5 = Sphere(Vec3(-1, 0, -1), -0.45, Dielectric(1.5f0))
+  sphere5 = Sphere(Vec3(-1, 0, -1), -0.45, Dielectric(1.5f0))
   
-  world = ObjectSet([sphere1, sphere2, sphere3, sphere4])
+  world = ObjectSet([sphere1, sphere2, sphere3, sphere4, sphere5])
 
   @showprogress 1 "Rendering..." for j in h:-1:1
     for i in 1:w
