@@ -15,13 +15,19 @@ using .CameraDef
 
 using Images
 using ProgressMeter
+using LinearAlgebra
 
 function main()
-  w, h = 400, 200
-  samples = 500
+  w, h = 200, 100
+  samples = 50
   img = zeros(Float32, 3, h, w)
 
-  cam = Camera(Vec3(-2, 2, 1), Vec3(0, -0.175, -1), Vec3(0, 1, 0), Float32(pi/5.75), Float32(w / h))
+  camera_pos = Vec3(3, 3, 2)
+  camera_target = Vec3(0, 0, -1)
+  focus_dist = norm(camera_pos - camera_target)
+  aperture = 2.0f0
+
+  cam = Camera(camera_pos, camera_target, Vec3(0, 1, 0), Float32(pi/6), Float32(w / h), aperture, focus_dist)
 
   sphere1 = Sphere(Vec3(0, 0, -1), 0.5, Diffuse(Vec3(0.1, 0.2, 0.5)))
   sphere2 = Sphere(Vec3(0, -100.5, -1), 100, Diffuse(Vec3(0.8, 0.8, 0.0)))
