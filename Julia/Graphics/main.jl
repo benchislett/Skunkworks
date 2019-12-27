@@ -17,28 +17,60 @@ using Images
 using ProgressMeter
 using LinearAlgebra
 
+function random_color()
+  return Vec3(0.5*(1 + rand()), 0.5*(1 + rand()), 0.5*(1 + rand()))
+end
+
+function random_world()
+  world = ObjectSet()
+  
+  # Surface
+  push!(world, Sphere(Vec3(0, -1000, 0), 1000, Diffuse(Vec3(0.5, 0.5, 0.5))))
+  
+  for x in -11:11
+    for z in -11:11
+      center = Vec3(x + 0.9*rand(), 0.2, z + 0.9*rand())
+
+      if norm(center - Vec3(4, 0.2, 0)) > 0.9
+        mat_choice = rand()
+        if mat_choice < 0.6 # Diffuse
+          push!(world, Sphere(center, 0.2, Diffuse(random_color())))
+        elseif mat_choice < 0.8 # Metal
+          push!(world, Sphere(center, 0.2, Metal(random_color(), 0.3f0*rand(Float32))))
+        else # Glass
+          push!(world, Sphere(center, 0.2, Dielectric(1.5f0)))
+        end
+      end
+    end
+  end
+
+  # Central Spheres
+  push!(world, Sphere(Vec3(0, 1, 0), 1.0f0, Dielectric(1.5f0)))
+  push!(world, Sphere(Vec3(-4, 1, 0), 1.0f0, Diffuse(Vec3(0.4, 0.2, 0.1))))
+  push!(world, Sphere(Vec3(4, 1, 0), 1.0f0, Metal(Vec3(0.7, 0.6, 0.5), 0.0f0)))
+
+  return world
+end
+
+
 function main()
-  w, h = 200, 100
-  samples = 50
+  w, h = 400, 200
+  samples = 250
   img = zeros(Float32, 3, h, w)
 
-  camera_pos = Vec3(3, 3, 2)
-  camera_target = Vec3(0, 0, -1)
+  camera_pos = Vec3(13, 2, 3)
+  camera_target = Vec3(0, 0, 0)
   focus_dist = norm(camera_pos - camera_target)
-  aperture = 2.0f0
+  aperture = 0.1f0
 
   cam = Camera(camera_pos, camera_target, Vec3(0, 1, 0), Float32(pi/6), Float32(w / h), aperture, focus_dist)
 
-  sphere1 = Sphere(Vec3(0, 0, -1), 0.5, Diffuse(Vec3(0.1, 0.2, 0.5)))
-  sphere2 = Sphere(Vec3(0, -100.5, -1), 100, Diffuse(Vec3(0.8, 0.8, 0.0)))
-  sphere3 = Sphere(Vec3(1, 0, -1), 0.5, Metal(Vec3(0.8, 0.6, 0.2), 0.3f0))
-  sphere4 = Sphere(Vec3(-1, 0, -1), 0.5, Dielectric(1.5f0))
-  sphere5 = Sphere(Vec3(-1, 0, -1), -0.45, Dielectric(1.5f0))
-  
-  world = ObjectSet([sphere1, sphere2, sphere3, sphere4, sphere5])
+  world = random_world()
 
-  @showprogress 1 "Rendering..." for j in h:-1:1
+  p = Progress(w * h, 1, "Rendering...")
+  for j in h:-1:1
     for i in 1:w
+      next!(p)
       color = Vec3(0, 0, 0)
       for _ in 1:samples
         u::Float32 = (i + rand()) / w
