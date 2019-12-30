@@ -18,6 +18,10 @@ using ProgressMeter
 using LinearAlgebra
 
 function random_color()
+  return Vec3(rand(), rand(), rand())
+end
+
+function random_light_color()
   return Vec3(0.5*(1 + rand()), 0.5*(1 + rand()), 0.5*(1 + rand()))
 end
 
@@ -36,7 +40,7 @@ function random_world()
         if mat_choice < 0.6 # Diffuse
           push!(world, Sphere(center, 0.2, Diffuse(random_color())))
         elseif mat_choice < 0.8 # Metal
-          push!(world, Sphere(center, 0.2, Metal(random_color(), 0.3f0*rand(Float32))))
+          push!(world, Sphere(center, 0.2, Metal(random_light_color(), 0.3f0*rand(Float32))))
         else # Glass
           push!(world, Sphere(center, 0.2, Dielectric(1.5f0)))
         end
@@ -49,13 +53,13 @@ function random_world()
   push!(world, Sphere(Vec3(-4, 1, 0), 1.0f0, Diffuse(Vec3(0.4, 0.2, 0.1))))
   push!(world, Sphere(Vec3(4, 1, 0), 1.0f0, Metal(Vec3(0.7, 0.6, 0.5), 0.0f0)))
 
-  return world
+  return make_bvh(world)
 end
 
 
 function main()
   w, h = 400, 200
-  samples = 250
+  samples = 100
   img = zeros(Float32, 3, h, w)
 
   camera_pos = Vec3(13, 2, 3)

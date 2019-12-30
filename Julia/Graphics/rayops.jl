@@ -16,7 +16,7 @@ module RayOps
     return ((1 - t) .* white) .+ (t .* blue)
   end
 
-  function get_color(r::Ray, world::ObjectSet, depth::Int = 1)
+  function get_color(r::Ray, world, depth::Int = 1)
     did_hit, record = hit(r, world, OpenInterval{Float32}(0.001f0, Inf32))
     if did_hit
       did_scatter, scattered_ray, attenuation = scatter(record.material, r, record)
