@@ -1,6 +1,7 @@
 module Materials
 
   using ..RayDef
+  using ..Textures
 
   using LinearAlgebra
 
@@ -13,7 +14,7 @@ module Materials
     material::Material
   end
 
-  HitRecord() = HitRecord(0, Vec3(0, 0, 0), Vec3(0, 0, 0), Diffuse(Vec3(0.8, 0.8, 0.8)))
+  HitRecord() = HitRecord(0, Vec3(0, 0, 0), Vec3(0, 0, 0), Diffuse(ConstantTexture(Vec3(0.8, 0.8, 0.8))))
 
   function random_unit_sphere()
     p = Vec3(5, 5, 5)
@@ -24,13 +25,13 @@ module Materials
   end
 
   struct Diffuse <: Material
-    albedo::Vec3
+    albedo::Texture
   end
 
   function scatter(mat::Diffuse, r::Ray, record::HitRecord)
     random_target = record.point + record.normal + random_unit_sphere()
     scattered = Ray(record.point, random_target - record.point)
-    attenuation = mat.albedo
+    attenuation = value(mat.albedo, 0.0f0, 0.0f0, record.point)
     return (true, scattered, attenuation)
   end
 

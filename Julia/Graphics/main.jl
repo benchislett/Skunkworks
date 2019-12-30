@@ -1,6 +1,9 @@
 include("ray.jl")
 using .RayDef
 
+include("texture.jl")
+using .Textures
+
 include("material.jl")
 using .Materials
 
@@ -29,7 +32,7 @@ function random_world()
   world = ObjectSet()
   
   # Surface
-  push!(world, Sphere(Vec3(0, -1000, 0), 1000, Diffuse(Vec3(0.5, 0.5, 0.5))))
+  push!(world, Sphere(Vec3(0, -1000, 0), 1000, Diffuse(ConstantTexture(Vec3(0.5, 0.5, 0.5)))))
   
   for x in -11:11
     for z in -11:11
@@ -38,7 +41,7 @@ function random_world()
       if norm(center - Vec3(4, 0.2, 0)) > 0.9
         mat_choice = rand()
         if mat_choice < 0.6 # Diffuse
-          push!(world, Sphere(center, 0.2, Diffuse(random_color())))
+          push!(world, Sphere(center, 0.2, Diffuse(ConstantTexture(random_color()))))
         elseif mat_choice < 0.8 # Metal
           push!(world, Sphere(center, 0.2, Metal(random_light_color(), 0.3f0*rand(Float32))))
         else # Glass
@@ -50,7 +53,7 @@ function random_world()
 
   # Central Spheres
   push!(world, Sphere(Vec3(0, 1, 0), 1.0f0, Dielectric(1.5f0)))
-  push!(world, Sphere(Vec3(-4, 1, 0), 1.0f0, Diffuse(Vec3(0.4, 0.2, 0.1))))
+  push!(world, Sphere(Vec3(-4, 1, 0), 1.0f0, Diffuse(ConstantTexture(Vec3(0.4, 0.2, 0.1)))))
   push!(world, Sphere(Vec3(4, 1, 0), 1.0f0, Metal(Vec3(0.7, 0.6, 0.5), 0.0f0)))
 
   return make_bvh(world)
@@ -58,8 +61,8 @@ end
 
 
 function main()
-  w, h = 400, 200
-  samples = 100
+  w, h = 200, 100
+  samples = 50
   img = zeros(Float32, 3, h, w)
 
   camera_pos = Vec3(13, 2, 3)
