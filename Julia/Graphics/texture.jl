@@ -26,7 +26,21 @@ module Textures
     end
   end
 
+  struct ImageTexture <: Texture
+    data::Array{Float32, 3} # RGB, h, w
+  end
+
+  function value(tex::ImageTexture, u::Float32, v::Float32, p::Vec3)
+    h, w = size(tex.data)[2:3]
+    i = floor(Int, clamp(u * w + 1, 1, w))
+    j = floor(Int, clamp((1 - v) * h + 0.999, 1, h))
+    
+    val = tex.data[:, j, i]
+    
+    return Vec3(val[1], val[2], val[3])
+  end
+
   export Texture
-  export ConstantTexture, CheckerTexture
+  export ConstantTexture, CheckerTexture, ImageTexture
   export value
 end

@@ -38,6 +38,14 @@ module Objects
     return Slab(s.center .- s.radius, s.center .+ s.radius)
   end
 
+  function get_sphere_uv(point::Vec3)
+    phi = atan(point[3], point[1])
+    theta = asin(point[2])
+    u::Float32 = 1 - (phi + pi) / (2 * pi)
+    v::Float32 = (theta + pi / 2) / pi
+    return u, v
+  end
+
   function hit(r::Ray, s::Sphere, t::OpenInterval{Float32})
     record = HitRecord()
 
@@ -65,6 +73,7 @@ module Objects
         record.point = ray_at(r, record.time)
         record.normal = (record.point - s.center) / s.radius
         record.material = s.material
+        record.u, record.v = get_sphere_uv(record.normal)
         return true, record
       else
         return false, record
