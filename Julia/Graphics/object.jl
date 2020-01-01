@@ -157,6 +157,51 @@ module Objects
     return BoundingNode(left, right, superslab(bounding_slab(left), bounding_slab(right)))
   end
 
-  export Object, ObjectSet, Sphere, Slab, BoundingNode
+  struct Rect <: Object
+    lower_left::Vec3
+    upper_right::Vec3
+    material::Material
+    axis::Int
+    Rect(ll::Vec3, ur::Vec3, mat::Material) = new(ll, ur, mat, findfirst(iszero, ll .- ur))
+  end
+
+  function single_one(index::Int)
+    arr = Matrix(1.0f0I, 3, 3)[index, :]
+    return Vec3(arr...)
+  end
+
+  function hit(r::Ray, rect::Rect, t::OpenInterval{Float32})
+    record = HitRecord()
+
+    axis_depth = rect.lower_left[rect.axis]
+    time = (axis_depth - r.from[rect.axis]) / r.to[rect.axis]
+    
+    if time in t
+      point = ray_at(r, time)
+      if all(rect.upper_right .>= point .>= rect.lower_left)
+        uv_xyz_points = collect((point .-  rect.lower_left) ./ (rect.upper_right .- rect.lower_left))
+        deleteat!(uv_xyz_points, rect.axis)
+        record.u, record.v = uv_xyz_points
+        record.time = time
+        record.material = rect.material
+        record.point = point
+        if r.from[rect.axis] > rect.lower_left[rect.axis]
+          record.normal = -single_one(rect.axis)
+        else
+          record.normal = single_one(rect.axis)
+        end
+        return true, record
+      end
+    end
+
+    return false, record
+  end
+
+  function bounding_slab(rect::Rect)
+    one_axis = single_one(rect.axis)
+    return Slab(rect.lower_left .- 0.001 .* one_axis, rect.upper_right .+ 0.001 .* one_axis)
+  end
+
+  export Object, ObjectSet, Sphere, Slab, BoundingNode, Rect
   export hit, make_bvh
 end

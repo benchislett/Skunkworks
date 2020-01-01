@@ -29,21 +29,31 @@ function random_light_color()
 end
 
 function main()
-  w, h = 200, 100
+  w, h = 100, 100
   samples = 50
   img = zeros(Float32, 3, h, w)
 
-  camera_pos = Vec3(8, 0, 2)
-  camera_target = Vec3(0, 0, 0)
+  camera_pos = Vec3(278, 278, -800)
+  camera_target = Vec3(278, 278, 0)
   focus_dist = norm(camera_pos - camera_target)
-  aperture = 0.1f0
+  aperture = 0.0f0
+  fov = Float32(2 * pi / 9)
 
-  cam = Camera(camera_pos, camera_target, Vec3(0, 1, 0), Float32(pi/6), Float32(w / h), aperture, focus_dist)
+  cam = Camera(camera_pos, camera_target, Vec3(0, 1, 0), fov, Float32(w / h), aperture, focus_dist)
 
   world = ObjectSet()
-  earth_img = load("data/earthmap.png")
-  earth_img = convert(Array{Float32, 3}, channelview(earth_img))
-  push!(world, Sphere(Vec3(0, 0, 0), 2.0f0, Diffuse(ImageTexture(earth_img))))
+  
+  red = Diffuse(ConstantTexture(Vec3(0.65, 0.05, 0.05)))
+  white = Diffuse(ConstantTexture(Vec3(0.73, 0.73, 0.73)))
+  green = Diffuse(ConstantTexture(Vec3(0.12, 0.45, 0.15)))
+
+  push!(world, Rect(Vec3(555, 0, 0), Vec3(555, 555, 555), green))
+  push!(world, Rect(Vec3(0, 0, 0), Vec3(0, 555, 555), red))
+  # push!(world, Rect(Vec3(213, 554, 227), Vec3(343, 554, 332), light))
+  push!(world, Rect(Vec3(0, 555, 0), Vec3(555, 555, 555), white))
+  push!(world, Rect(Vec3(0, 0, 0), Vec3(555, 0, 555), white))
+  push!(world, Rect(Vec3(0, 0, 555), Vec3(555, 555, 555), white))
+
   world = make_bvh(world)
 
   p = Progress(w * h, 1, "Rendering...")
