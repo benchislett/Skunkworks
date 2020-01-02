@@ -11,19 +11,21 @@ module RayOps
   using LinearAlgebra
 
   function background(v::Vec3)
-    y = normalize(v)[2]
-    t = 0.5 * (y + 1)
-    return ((1 - t) .* white) .+ (t .* blue)
+    return Vec3(0.01, 0.01, 0.01)
+    # y = normalize(v)[2]
+    # t = 0.5 * (y + 1)
+    # return ((1 - t) .* white) .+ (t .* blue)
   end
 
   function get_color(r::Ray, world, depth::Int = 1)
     did_hit, record = hit(r, world, OpenInterval{Float32}(0.001f0, Inf32))
     if did_hit
+      emittance = emitted(record.material, record.u, record.v, record.point)
       did_scatter, scattered_ray, attenuation = scatter(record.material, r, record)
       if depth < 50 && did_scatter
-        return attenuation .* get_color(scattered_ray, world, depth + 1)
+        return emittance .+ (attenuation .* get_color(scattered_ray, world, depth + 1))
       else
-        return Vec3(0, 0, 0)
+        return emittance
       end
     else
       return background(r.to)

@@ -40,7 +40,7 @@ module Objects
 
   function get_sphere_uv(point::Vec3)
     phi = atan(point[3], point[1])
-    theta = asin(point[2])
+    theta = asin(clamp(point[2], -1, 1))
     u::Float32 = 1 - (phi + pi) / (2 * pi)
     v::Float32 = (theta + pi / 2) / pi
     return u, v
@@ -186,9 +186,9 @@ module Objects
         record.material = rect.material
         record.point = point
         if r.from[rect.axis] > rect.lower_left[rect.axis]
-          record.normal = -single_one(rect.axis)
-        else
           record.normal = single_one(rect.axis)
+        else
+          record.normal = -single_one(rect.axis)
         end
         return true, record
       end

@@ -107,8 +107,24 @@ module Materials
     return (true, scattered, attenuation)
   end
 
+  struct Light <: Material
+    emitted::Texture
+  end
+
+  function scatter(mat::Light, r::Ray, record::HitRecord)
+    return (false, Ray(Vec3(0, 0, 0), Vec3(1, 1, 1)), Vec3(1, 1, 1))
+  end
+  
+  function emitted(mat::Material, u::Float32, v::Float32, p::Vec3)
+    return Vec3(0, 0, 0)
+  end
+
+  function emitted(mat::Light, u::Float32, v::Float32, point::Vec3)
+    return value(mat.emitted, u, v, point)
+  end
+
   export HitRecord
-  export Material, Diffuse, Metal, Dielectric
-  export scatter
+  export Material, Diffuse, Metal, Dielectric, Light
+  export scatter, emitted
 end
 
