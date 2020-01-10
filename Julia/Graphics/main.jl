@@ -30,7 +30,7 @@ end
 
 function main()
   w, h = 200, 200
-  samples = 1250
+  samples = 10
   img = zeros(Float32, 3, h, w)
 
   camera_pos = Vec3(278, 278, -800)
@@ -54,6 +54,8 @@ function main()
   push!(world, Rect(Vec3(0, 555, 0), Vec3(555, 555, 555), white))
   push!(world, Rect(Vec3(0, 0, 0), Vec3(555, 0, 555), white))
   push!(world, Rect(Vec3(0, 0, 555), Vec3(555, 555, 555), white))
+  push!(world, Box(Vec3(130, 0, 65), Vec3(295, 165, 230), white))
+  push!(world, Box(Vec3(265, 0, 295), Vec3(430, 330, 460), white))
 
   world = make_bvh(world)
   

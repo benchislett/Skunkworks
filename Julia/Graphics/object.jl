@@ -202,6 +202,31 @@ module Objects
     return Slab(rect.lower_left .- 0.001 .* one_axis, rect.upper_right .+ 0.001 .* one_axis)
   end
 
-  export Object, ObjectSet, Sphere, Slab, BoundingNode, Rect
+  struct Box <: Object
+    lower_left::Vec3
+    upper_right::Vec3
+    rects::ObjectSet
+  end
+
+  function Box(lower_left::Vec3, upper_right::Vec3, mat::Material)
+    rects = ObjectSet()
+    push!(rects, Rect(lower_left, Vec3(upper_right[1], upper_right[2], lower_left[3]), mat))
+    push!(rects, Rect(Vec3(lower_left[1], lower_left[2], upper_right[3]), upper_right, mat))
+    push!(rects, Rect(lower_left, Vec3(upper_right[1], lower_left[2], upper_right[3]), mat))
+    push!(rects, Rect(Vec3(lower_left[1], upper_right[2], lower_left[3]), upper_right, mat))
+    push!(rects, Rect(lower_left, Vec3(lower_left[1], upper_right[2], upper_right[3]), mat))
+    push!(rects, Rect(Vec3(upper_right[1], lower_left[2], lower_left[3]), upper_right, mat))
+    return Box(lower_left, upper_right, rects)
+  end
+
+  function hit(r::Ray, b::Box, t::OpenInterval{Float32})
+    return hit(r, b.rects, t)
+  end
+
+  function bounding_slab(b::Box)
+    return Slab(b.lower_left, b.upper_right)
+  end
+  
+  export Object, ObjectSet, Sphere, Slab, BoundingNode, Rect, Box
   export hit, make_bvh
 end
