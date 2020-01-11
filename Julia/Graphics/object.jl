@@ -157,12 +157,12 @@ module Objects
     return BoundingNode(left, right, superslab(bounding_slab(left), bounding_slab(right)))
   end
 
-  struct Rect <: Object
+  struct AxisRect <: Object
     lower_left::Vec3
     upper_right::Vec3
     material::Material
     axis::Int
-    Rect(ll::Vec3, ur::Vec3, mat::Material) = new(ll, ur, mat, findfirst(iszero, ll .- ur))
+    AxisRect(ll::Vec3, ur::Vec3, mat::Material) = new(ll, ur, mat, findfirst(iszero, ll .- ur))
   end
 
   function single_one(index::Int)
@@ -170,7 +170,7 @@ module Objects
     return Vec3(arr...)
   end
 
-  function hit(r::Ray, rect::Rect, t::OpenInterval{Float32})
+  function hit(r::Ray, rect::AxisRect, t::OpenInterval{Float32})
     record = HitRecord()
 
     axis_depth = rect.lower_left[rect.axis]
@@ -197,9 +197,60 @@ module Objects
     return false, record
   end
 
-  function bounding_slab(rect::Rect)
+  function bounding_slab(rect::AxisRect)
     one_axis = single_one(rect.axis)
     return Slab(rect.lower_left .- 0.001 .* one_axis, rect.upper_right .+ 0.001 .* one_axis)
+  end
+
+  struct TrueRect <: Object
+    corner::Vec3
+    u::Vec3
+    v::Vec3
+    normal::Vec3
+    material::Material
+  end
+
+  function TrueRect(a::Vec3, mid::Vec3, c::Vec3, mat::Material) # 3 Points
+    u = a .- mid
+    v = c .- mid
+    return TrueRect(mid, u, v, normalize(cross(u, v)), mat)
+  end
+
+  function hit(r::Ray, rect::TrueRect, t::OpenInterval{Float32})
+    record = HitRecord()
+
+    slope_dot_normal = dot(r.to, rect.normal)
+
+    if abs(slope_dot_normal) < 1e-4
+      return false, record
+    else
+      time = dot(r.from .- rect.corner, rect.normal) / slope_dot_normal
+      if time in t
+        point = ray_at(r, time)
+        change_of_basis_matrix = inv([rect.u rect.v rect.normal])
+        u, v, _ = change_of_basis_matrix * (point .- rect.corner)
+        if 0 <= u <= 1 && 0 <= v <= 1
+          record.point = point
+          record.time = time
+          record.material = rect.material
+          record.u, record.v = u, v
+          record.normal = -sign(slope_dot_normal) * rect.normal # need to flip some normals
+          return true, record
+        else
+          return false, record
+        end
+      else
+        return false, record
+      end
+    end
+  end
+
+  function bounding_slab(rect::TrueRect)
+    p1 = rect.corner
+    p2 = rect.corner .+ rect.u
+    p3 = rect.corner .+ rect.v
+    p4 = rect.corner .+ rect.u .+ rect.v
+    return Slab(min.(p1, p2, p3, p4), max.(p1, p2, p3, p4))
   end
 
   struct Box <: Object
@@ -210,12 +261,12 @@ module Objects
 
   function Box(lower_left::Vec3, upper_right::Vec3, mat::Material)
     rects = ObjectSet()
-    push!(rects, Rect(lower_left, Vec3(upper_right[1], upper_right[2], lower_left[3]), mat))
-    push!(rects, Rect(Vec3(lower_left[1], lower_left[2], upper_right[3]), upper_right, mat))
-    push!(rects, Rect(lower_left, Vec3(upper_right[1], lower_left[2], upper_right[3]), mat))
-    push!(rects, Rect(Vec3(lower_left[1], upper_right[2], lower_left[3]), upper_right, mat))
-    push!(rects, Rect(lower_left, Vec3(lower_left[1], upper_right[2], upper_right[3]), mat))
-    push!(rects, Rect(Vec3(upper_right[1], lower_left[2], lower_left[3]), upper_right, mat))
+    push!(rects, AxisRect(lower_left, Vec3(upper_right[1], upper_right[2], lower_left[3]), mat))
+    push!(rects, AxisRect(Vec3(lower_left[1], lower_left[2], upper_right[3]), upper_right, mat))
+    push!(rects, AxisRect(lower_left, Vec3(upper_right[1], lower_left[2], upper_right[3]), mat))
+    push!(rects, AxisRect(Vec3(lower_left[1], upper_right[2], lower_left[3]), upper_right, mat))
+    push!(rects, AxisRect(lower_left, Vec3(lower_left[1], upper_right[2], upper_right[3]), mat))
+    push!(rects, AxisRect(Vec3(upper_right[1], lower_left[2], lower_left[3]), upper_right, mat))
     return Box(lower_left, upper_right, rects)
   end
 
@@ -227,6 +278,6 @@ module Objects
     return Slab(b.lower_left, b.upper_right)
   end
   
-  export Object, ObjectSet, Sphere, Slab, BoundingNode, Rect, Box
+  export Object, ObjectSet, Sphere, Slab, BoundingNode, AxisRect, Box, TrueRect
   export hit, make_bvh
 end

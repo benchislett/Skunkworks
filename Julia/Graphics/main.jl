@@ -29,8 +29,8 @@ function random_light_color()
 end
 
 function main()
-  w, h = 200, 200
-  samples = 10
+  w, h = 50, 50
+  samples = 50
   img = zeros(Float32, 3, h, w)
 
   camera_pos = Vec3(278, 278, -800)
@@ -48,14 +48,14 @@ function main()
   green = Diffuse(ConstantTexture(Vec3(0.12, 0.45, 0.15)))
   light = Light(ConstantTexture(Vec3(14, 14, 14)))
 
-  push!(world, Rect(Vec3(555, 0, 0), Vec3(555, 555, 555), green))
-  push!(world, Rect(Vec3(0, 0, 0), Vec3(0, 555, 555), red))
-  push!(world, Rect(Vec3(213, 554, 227), Vec3(343, 554, 332), light))
-  push!(world, Rect(Vec3(0, 555, 0), Vec3(555, 555, 555), white))
-  push!(world, Rect(Vec3(0, 0, 0), Vec3(555, 0, 555), white))
-  push!(world, Rect(Vec3(0, 0, 555), Vec3(555, 555, 555), white))
-  push!(world, Box(Vec3(130, 0, 65), Vec3(295, 165, 230), white))
-  push!(world, Box(Vec3(265, 0, 295), Vec3(430, 330, 460), white))
+  #push!(world, AxisRect(Vec3(555, 0, 0), Vec3(555, 555, 555), green))
+  #push!(world, AxisRect(Vec3(0, 0, 0), Vec3(0, 555, 555), red))
+  push!(world, AxisRect(Vec3(213, 554, 227), Vec3(343, 554, 332), light))
+  #push!(world, AxisRect(Vec3(0, 555, 0), Vec3(555, 555, 555), white))
+  #push!(world, AxisRect(Vec3(0, 0, 0), Vec3(555, 0, 555), white))
+  #push!(world, AxisRect(Vec3(0, 0, 555), Vec3(555, 555, 555), white))
+  
+  push!(world, TrueRect(Vec3(0, 0, 0), Vec3(0, 0, 555), Vec3(0, 555, 555), green))
 
   world = make_bvh(world)
   
