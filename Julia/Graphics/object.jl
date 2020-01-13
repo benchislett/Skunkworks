@@ -221,10 +221,10 @@ module Objects
 
     slope_dot_normal = dot(r.to, rect.normal)
 
-    if abs(slope_dot_normal) < 1e-4
+    if iszero(slope_dot_normal)
       return false, record
     else
-      time = dot(r.from .- rect.corner, rect.normal) / slope_dot_normal
+      time = dot(rect.corner .- r.from, rect.normal) / slope_dot_normal
       if time in t
         point = ray_at(r, time)
         change_of_basis_matrix = inv([rect.u rect.v rect.normal])
@@ -234,7 +234,7 @@ module Objects
           record.time = time
           record.material = rect.material
           record.u, record.v = u, v
-          record.normal = -sign(slope_dot_normal) * rect.normal # need to flip some normals
+          record.normal = -sign(slope_dot_normal) * rect.normal
           return true, record
         else
           return false, record
@@ -250,7 +250,7 @@ module Objects
     p2 = rect.corner .+ rect.u
     p3 = rect.corner .+ rect.v
     p4 = rect.corner .+ rect.u .+ rect.v
-    return Slab(min.(p1, p2, p3, p4), max.(p1, p2, p3, p4))
+    return Slab(min.(p1, p2, p3, p4) .- 0.001, max.(p1, p2, p3, p4) .+ 0.001)
   end
 
   struct Box <: Object
