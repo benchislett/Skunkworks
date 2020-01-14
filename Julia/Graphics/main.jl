@@ -29,8 +29,8 @@ function random_light_color()
 end
 
 function main()
-  w, h = 500, 500
-  samples = 1000
+  w, h = 100, 100
+  samples = 50
   img = zeros(Float32, 3, h, w)
 
   camera_pos = Vec3(278, 278, -800)
@@ -51,9 +51,22 @@ function main()
   push!(world, TrueRect(Vec3(555, 0, 0), Vec3(555, 555, 0), Vec3(555, 555, 555), green))
   push!(world, TrueRect(Vec3(0, 0, 0), Vec3(0, 555, 0), Vec3(0, 555, 555), red))
   push!(world, TrueRect(Vec3(213, 554, 227), Vec3(213, 554, 332), Vec3(343, 554, 332), light))
-  push!(world, TrueRect(Vec3(0, 555, 0), Vec3(555, 555, 0), Vec3(555, 555, 555), white))
-  push!(world, TrueRect(Vec3(0, 0, 0), Vec3(555, 0, 0), Vec3(555, 0, 555), white))
-  push!(world, TrueRect(Vec3(0, 0, 555), Vec3(0, 555, 555), Vec3(555, 555, 555), white))
+  #push!(world, TrueRect(Vec3(0, 555, 0), Vec3(555, 555, 0), Vec3(555, 555, 555), white))
+  #push!(world, TrueRect(Vec3(0, 0, 0), Vec3(555, 0, 0), Vec3(555, 0, 555), white))
+  #push!(world, TrueRect(Vec3(0, 0, 555), Vec3(0, 555, 555), Vec3(555, 555, 555), white))
+
+  white_wall_points = Matrix{Vec3}(undef, (4, 2))
+  white_wall_points[1, 1] = Vec3(0, 0, 0)
+  white_wall_points[1, 2] = Vec3(555, 0, 0)
+  white_wall_points[2, 1] = Vec3(0, 0, 555)
+  white_wall_points[2, 2] = Vec3(555, 0, 555)
+  white_wall_points[3, 1] = Vec3(0, 555, 555)
+  white_wall_points[3, 2] = Vec3(555, 555, 555)
+  white_wall_points[4, 1] = Vec3(0, 555, 0)
+  white_wall_points[4, 2] = Vec3(555, 555, 0)
+
+  white_wall_patch = Patch(white_wall_points, white)
+  push!(world, white_wall_patch)
 
   world = make_bvh(world)
   

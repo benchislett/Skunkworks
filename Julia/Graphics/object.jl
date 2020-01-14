@@ -253,6 +253,29 @@ module Objects
     return Slab(min.(p1, p2, p3, p4) .- 0.001, max.(p1, p2, p3, p4) .+ 0.001)
   end
 
+  struct Patch <: Object
+    points::Array{Vec3, 2}
+    rects::ObjectSet
+  end
+
+  function Patch(points::Array{Vec3, 2}, mat::Material)
+    rects = ObjectSet()
+    for j in 1:(size(points, 2)-1)
+      for i in 1:(size(points, 1)-1)
+        push!(rects, TrueRect(points[i, j], points[i, j + 1], points[i + 1, j + 1], mat))
+      end
+    end
+    return Patch(points, rects)
+  end
+
+  function hit(r::Ray, p::Patch, t::OpenInterval{Float32})
+    return hit(r, p.rects, t)
+  end
+
+  function bounding_slab(p::Patch)
+    return bounding_slab(p.rects)
+  end
+
   struct Box <: Object
     lower_left::Vec3
     upper_right::Vec3
@@ -278,6 +301,6 @@ module Objects
     return Slab(b.lower_left, b.upper_right)
   end
   
-  export Object, ObjectSet, Sphere, Slab, BoundingNode, AxisRect, Box, TrueRect
+  export Object, ObjectSet, Sphere, Slab, BoundingNode, AxisRect, Box, TrueRect, Patch
   export hit, make_bvh
 end

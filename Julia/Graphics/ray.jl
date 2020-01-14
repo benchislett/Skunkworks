@@ -2,9 +2,9 @@ module RayDef
 
   using LinearAlgebra
   using StaticArrays
-
+  
   Vec3 = SVector{3, Float32}
-
+  
   struct Ray
     from::Vec3
     to::Vec3
