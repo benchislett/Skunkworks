@@ -4,6 +4,7 @@ module Objects
 
   using IntervalSets
   using LinearAlgebra
+  using StrLiterals
 
   abstract type Object end
 
@@ -202,57 +203,88 @@ module Objects
     return Slab(rect.lower_left .- 0.001 .* one_axis, rect.upper_right .+ 0.001 .* one_axis)
   end
 
-  struct TrueRect <: Object
-    corner::Vec3
+  struct Tri <: Object
+    a::Vec3
+    b::Vec3
+    c::Vec3
     u::Vec3
     v::Vec3
     normal::Vec3
-    change_of_basis_matrix::Matrix{Float32}
     material::Material
   end
 
-  function TrueRect(a::Vec3, mid::Vec3, c::Vec3, mat::Material) # 3 Points
-    u = a .- mid
-    v = c .- mid
+  function Tri(a::Vec3, b::Vec3, c::Vec3, mat::Material)
+    u = b .- a
+    v = c .- a
+
     normal = normalize(cross(u, v))
-    matrix = inv([u v normal])
-    return TrueRect(mid, u, v, normal, matrix, mat)
+
+    return Tri(a, b, c, u, v, normal, mat)
   end
 
-  function hit(r::Ray, rect::TrueRect, t::OpenInterval{Float32})
+  function hit(r::Ray, tri::Tri, t::OpenInterval{Float32}) # Moller-Trumbore
     record = HitRecord()
 
-    slope_dot_normal = dot(r.to, rect.normal)
+    h = cross(r.to, tri.v)
+    a = dot(tri.u, h)
 
-    if iszero(slope_dot_normal)
-      return false, record
+    if iszero(a) return false, record end
+    
+    f = 1.0f0 / a
+    s = r.from - tri.a
+    u = f * dot(s, h)
+    
+    if !(0.0f0 <= u <= 1.0f0) return false, record end
+
+    q = cross(s, tri.u)
+    v = f * dot(r.to, q)
+
+    if (v < 0.0f0 || u + v > 1.0f0) return false, record end
+
+    time = f * dot(tri.v, q)
+    if time in t
+      record.point = ray_at(r, time)
+      record.time = time
+      record.material = tri.material
+      record.u, record.v = u, v
+      record.normal = -sign(dot(r.to, tri.normal)) * tri.normal
+      return true, record
     else
-      time = dot(rect.corner .- r.from, rect.normal) / slope_dot_normal
-      if time in t
-        point = ray_at(r, time)
-        u, v, _ = rect.change_of_basis_matrix * (point .- rect.corner)
-        if 0 <= u <= 1 && 0 <= v <= 1
-          record.point = point
-          record.time = time
-          record.material = rect.material
-          record.u, record.v = u, v
-          record.normal = -sign(slope_dot_normal) * rect.normal
-          return true, record
-        else
-          return false, record
-        end
-      else
-        return false, record
-      end
+      return false, record
     end
   end
 
-  function bounding_slab(rect::TrueRect)
-    p1 = rect.corner
-    p2 = rect.corner .+ rect.u
-    p3 = rect.corner .+ rect.v
-    p4 = rect.corner .+ rect.u .+ rect.v
-    return Slab(min.(p1, p2, p3, p4) .- 0.001, max.(p1, p2, p3, p4) .+ 0.001)
+  function bounding_slab(tri::Tri)
+    return Slab(min.(tri.a, tri.b, tri.c) .- 0.001, max.(tri.a, tri.b, tri.c) .+ 0.001)
+  end
+
+  struct Quad <: Object
+    tri1::Tri
+    tri2::Tri
+  end
+
+  function Quad(a::Vec3, b::Vec3, c::Vec3, d::Vec3, mat::Material)
+    tri1 = Tri(a, b, c, mat)
+    tri2 = Tri(d, c, a, mat)
+    return Quad(tri1, tri2)
+  end
+
+  function hit(r::Ray, q::Quad, t::OpenInterval{Float32})
+    hit1, record1 = hit(r, q.tri1, t)
+    if (!hit1) return false, HitRecord() end
+
+    hit2, record2 = hit(r, q.tri2, t)
+    if (!hit2) return true, record1 end
+
+    if record1.time < record2.time
+      return true, record1
+    else
+      return true, record2
+    end
+  end
+
+  function bounding_slab(q::Quad)
+    return superslab(bounding_slab(q.tri1), bounding_slab(q.tri2))
   end
 
   struct Patch <: Object
@@ -264,7 +296,7 @@ module Objects
     rects = ObjectSet()
     for j in 1:(size(points, 2)-1)
       for i in 1:(size(points, 1)-1)
-        push!(rects, TrueRect(points[i, j], points[i, j + 1], points[i + 1, j + 1], mat))
+        push!(rects, Quad(points[i, j], points[i, j + 1], points[i + 1, j + 1], points[i + 1, j],  mat))
       end
     end
     return Patch(points, rects)
@@ -316,6 +348,6 @@ module Objects
     return Slab(b.lower_left, b.upper_right)
   end
   
-  export Object, ObjectSet, Sphere, Slab, BoundingNode, AxisRect, Box, TrueRect, Patch, PatchSet
+  export Object, ObjectSet, Sphere, Slab, BoundingNode, AxisRect, Box, Tri, Quad, Patch, PatchSet
   export hit, make_bvh
 end

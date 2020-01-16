@@ -32,7 +32,7 @@ function random_light_color()
 end
 
 function main()
-  w, h = 256, 256
+  w, h = 128, 128
   samples = 10
   img = zeros(Float32, 3, h, w)
 
@@ -50,13 +50,6 @@ function main()
   white = Diffuse(ConstantTexture(Vec3(0.73, 0.73, 0.73)))
   green = Diffuse(ConstantTexture(Vec3(0.12, 0.45, 0.15)))
   light = Light(ConstantTexture(Vec3(14, 14, 14)))
-
-  #push!(world, TrueRect(Vec3(555, 0, 0), Vec3(555, 555, 0), Vec3(555, 555, 555), green))
-  #push!(world, TrueRect(Vec3(0, 0, 0), Vec3(0, 555, 0), Vec3(0, 555, 555), red))
-  #push!(world, TrueRect(Vec3(213, 554, 227), Vec3(213, 554, 332), Vec3(343, 554, 332), light))
-  #push!(world, TrueRect(Vec3(0, 555, 0), Vec3(555, 555, 0), Vec3(555, 555, 555), white))
-  #push!(world, TrueRect(Vec3(0, 0, 0), Vec3(555, 0, 0), Vec3(555, 0, 555), white))
-  #push!(world, TrueRect(Vec3(0, 0, 555), Vec3(0, 555, 555), Vec3(555, 555, 555), white))
 
   push!(world, loadPatches("data/teapotCGA.bpt", 1.0f0, Vec3(0, 0, 5), white))
 
