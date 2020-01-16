@@ -32,11 +32,11 @@ function random_light_color()
 end
 
 function main()
-  w, h = 128, 128
-  samples = 10
+  w, h = 64, 64
+  samples = 5
   img = zeros(Float32, 3, h, w)
 
-  camera_pos = Vec3(3, 3, 0)
+  camera_pos = Vec3(-6, 4, 12)
   camera_target = Vec3(0, 0, 5)
   focus_dist = norm(camera_pos - camera_target)
   aperture = 0.0f0

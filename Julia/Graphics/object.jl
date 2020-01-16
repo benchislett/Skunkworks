@@ -265,15 +265,16 @@ module Objects
 
   function Quad(a::Vec3, b::Vec3, c::Vec3, d::Vec3, mat::Material)
     tri1 = Tri(a, b, c, mat)
-    tri2 = Tri(d, c, a, mat)
+    tri2 = Tri(a, c, d, mat)
     return Quad(tri1, tri2)
   end
 
   function hit(r::Ray, q::Quad, t::OpenInterval{Float32})
     hit1, record1 = hit(r, q.tri1, t)
-    if (!hit1) return false, HitRecord() end
-
     hit2, record2 = hit(r, q.tri2, t)
+
+    if (!hit1 && !hit2) return false, HitRecord() end
+    if (!hit1) return true, record2 end
     if (!hit2) return true, record1 end
 
     if record1.time < record2.time
