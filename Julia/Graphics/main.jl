@@ -22,6 +22,7 @@ using .CameraDef
 using Images
 using ProgressMeter
 using LinearAlgebra
+using Base.Threads
 
 function random_color()
   return Vec3(rand(), rand(), rand())
@@ -32,8 +33,8 @@ function random_light_color()
 end
 
 function main()
-  w, h = 64, 64
-  samples = 5
+  w, h = 128, 128
+  samples = 10
   img = zeros(Float32, 3, h, w)
 
   camera_pos = Vec3(-6, 4, 12)
@@ -57,8 +58,8 @@ function main()
   
   try
     p = Progress(w * h, 1, "Rendering...")
-      for j in h:-1:1
-      for i in 1:w
+    for j in h:-1:1
+      @threads for i in 1:w
         next!(p)
         color = Vec3(0, 0, 0)
         for _ in 1:samples
