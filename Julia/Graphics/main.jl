@@ -10,6 +10,9 @@ using .Materials
 include("object.jl")
 using .Objects
 
+include("io.jl")
+using .FileIO
+
 include("rayops.jl")
 using .RayOps
 
@@ -29,12 +32,12 @@ function random_light_color()
 end
 
 function main()
-  w, h = 100, 100
-  samples = 50
+  w, h = 256, 256
+  samples = 10
   img = zeros(Float32, 3, h, w)
 
-  camera_pos = Vec3(278, 278, -800)
-  camera_target = Vec3(278, 278, 0)
+  camera_pos = Vec3(3, 3, 0)
+  camera_target = Vec3(0, 0, 5)
   focus_dist = norm(camera_pos - camera_target)
   aperture = 0.0f0
   fov = Float32(2 * pi / 9)
@@ -48,25 +51,14 @@ function main()
   green = Diffuse(ConstantTexture(Vec3(0.12, 0.45, 0.15)))
   light = Light(ConstantTexture(Vec3(14, 14, 14)))
 
-  push!(world, TrueRect(Vec3(555, 0, 0), Vec3(555, 555, 0), Vec3(555, 555, 555), green))
-  push!(world, TrueRect(Vec3(0, 0, 0), Vec3(0, 555, 0), Vec3(0, 555, 555), red))
-  push!(world, TrueRect(Vec3(213, 554, 227), Vec3(213, 554, 332), Vec3(343, 554, 332), light))
+  #push!(world, TrueRect(Vec3(555, 0, 0), Vec3(555, 555, 0), Vec3(555, 555, 555), green))
+  #push!(world, TrueRect(Vec3(0, 0, 0), Vec3(0, 555, 0), Vec3(0, 555, 555), red))
+  #push!(world, TrueRect(Vec3(213, 554, 227), Vec3(213, 554, 332), Vec3(343, 554, 332), light))
   #push!(world, TrueRect(Vec3(0, 555, 0), Vec3(555, 555, 0), Vec3(555, 555, 555), white))
   #push!(world, TrueRect(Vec3(0, 0, 0), Vec3(555, 0, 0), Vec3(555, 0, 555), white))
   #push!(world, TrueRect(Vec3(0, 0, 555), Vec3(0, 555, 555), Vec3(555, 555, 555), white))
 
-  white_wall_points = Matrix{Vec3}(undef, (4, 2))
-  white_wall_points[1, 1] = Vec3(0, 0, 0)
-  white_wall_points[1, 2] = Vec3(555, 0, 0)
-  white_wall_points[2, 1] = Vec3(0, 0, 555)
-  white_wall_points[2, 2] = Vec3(555, 0, 555)
-  white_wall_points[3, 1] = Vec3(0, 555, 555)
-  white_wall_points[3, 2] = Vec3(555, 555, 555)
-  white_wall_points[4, 1] = Vec3(0, 555, 0)
-  white_wall_points[4, 2] = Vec3(555, 555, 0)
-
-  white_wall_patch = Patch(white_wall_points, white)
-  push!(world, white_wall_patch)
+  push!(world, loadPatches("data/teapotCGA.bpt", 1.0f0, Vec3(0, 0, 5), white))
 
   world = make_bvh(world)
   

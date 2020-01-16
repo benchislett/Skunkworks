@@ -207,13 +207,16 @@ module Objects
     u::Vec3
     v::Vec3
     normal::Vec3
+    change_of_basis_matrix::Matrix{Float32}
     material::Material
   end
 
   function TrueRect(a::Vec3, mid::Vec3, c::Vec3, mat::Material) # 3 Points
     u = a .- mid
     v = c .- mid
-    return TrueRect(mid, u, v, normalize(cross(u, v)), mat)
+    normal = normalize(cross(u, v))
+    matrix = inv([u v normal])
+    return TrueRect(mid, u, v, normal, matrix, mat)
   end
 
   function hit(r::Ray, rect::TrueRect, t::OpenInterval{Float32})
@@ -227,8 +230,7 @@ module Objects
       time = dot(rect.corner .- r.from, rect.normal) / slope_dot_normal
       if time in t
         point = ray_at(r, time)
-        change_of_basis_matrix = inv([rect.u rect.v rect.normal])
-        u, v, _ = change_of_basis_matrix * (point .- rect.corner)
+        u, v, _ = rect.change_of_basis_matrix * (point .- rect.corner)
         if 0 <= u <= 1 && 0 <= v <= 1
           record.point = point
           record.time = time
@@ -276,6 +278,19 @@ module Objects
     return bounding_slab(p.rects)
   end
 
+  struct PatchSet <: Object
+    patches::ObjectSet
+    PatchSet() = new(ObjectSet())
+  end
+
+  function hit(r::Ray, p::PatchSet, t::OpenInterval{Float32})
+    return hit(r, p.patches, t)
+  end
+
+  function bounding_slab(p::PatchSet)
+    return bounding_slab(p.patches)
+  end
+
   struct Box <: Object
     lower_left::Vec3
     upper_right::Vec3
@@ -301,6 +316,6 @@ module Objects
     return Slab(b.lower_left, b.upper_right)
   end
   
-  export Object, ObjectSet, Sphere, Slab, BoundingNode, AxisRect, Box, TrueRect, Patch
+  export Object, ObjectSet, Sphere, Slab, BoundingNode, AxisRect, Box, TrueRect, Patch, PatchSet
   export hit, make_bvh
 end

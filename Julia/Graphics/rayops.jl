@@ -11,7 +11,7 @@ module RayOps
   using LinearAlgebra
 
   function background(v::Vec3)
-    return Vec3(0.01, 0.01, 0.01)
+    return Vec3(0.7, 0.7, 0.7)
     # y = normalize(v)[2]
     # t = 0.5 * (y + 1)
     # return ((1 - t) .* white) .+ (t .* blue)
