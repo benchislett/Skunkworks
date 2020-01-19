@@ -34,14 +34,14 @@ end
 
 function main()
   w, h = 128, 128
-  samples = 10
+  samples = 50
   img = zeros(Float32, 3, h, w)
 
-  camera_pos = Vec3(-6, 4, 12)
-  camera_target = Vec3(0, 0, 5)
+  camera_pos = Vec3(0.5, 0.5, 0.5)
+  camera_target = Vec3(0, 0.2, 0)
   focus_dist = norm(camera_pos - camera_target)
   aperture = 0.0f0
-  fov = Float32(2 * pi / 9)
+  fov = Float32(pi / 9)
 
   cam = Camera(camera_pos, camera_target, Vec3(0, 1, 0), fov, Float32(w / h), aperture, focus_dist)
 
@@ -52,14 +52,14 @@ function main()
   green = Diffuse(ConstantTexture(Vec3(0.12, 0.45, 0.15)))
   light = Light(ConstantTexture(Vec3(14, 14, 14)))
 
-  push!(world, loadPatches("data/teapotCGA.bpt", 1.0f0, Vec3(0, 0, 5), white))
+  loadOFF("data/bunny.off", world, white)
 
   world = make_bvh(world)
   
   try
     p = Progress(w * h, 1, "Rendering...")
-    for j in h:-1:1
-      @threads for i in 1:w
+    @threads for j in h:-1:1
+      for i in 1:w
         next!(p)
         color = Vec3(0, 0, 0)
         for _ in 1:samples

@@ -5,6 +5,7 @@ module Objects
   using IntervalSets
   using LinearAlgebra
   using StrLiterals
+  using ProgressMeter
 
   abstract type Object end
 
@@ -141,21 +142,37 @@ module Objects
     sort!(world, by=obj->bounding_slab(obj).lower_left[axis])
   end
 
-  function make_bvh(world::ObjectSet)
-    axis = rand([1,2,3])
-    sort_along_axis!(world, axis)
-    
-    n = length(world)
-    if n == 1
-      left = right = world[1]
-    elseif n == 2
-      left, right = world
-    else
-      left = make_bvh(world[1:floor(Int, n/2)])
-      right = make_bvh(world[floor(Int, n/2) + 1:n])
+  function d(x::Object, y::Object) # Cluster distance function
+    slab = superslab(bounding_slab(x), bounding_slab(y))
+    l, w, h = slab.upper_right .- slab.lower_left
+    return 2 * ((l * w) + (w * h) + (l * h))
+  end
+
+
+  function make_bvh(world::ObjectSet) # Agglomerative Clustering
+    clusters = copy(world)
+    p = Progress(length(clusters), 1, "Constructing BVH...")
+    while length(clusters) > 2
+      next!(p)
+      best = Inf32
+      left = clusters[1]
+      right = clusters[1]
+      for obj1 in clusters
+        for obj2 in clusters
+          diff = d(obj1, obj2)
+          if obj1 != obj2 && diff < best
+            left = obj1
+            right = obj2
+            best = diff
+          end
+        end
+      end
+      deleteat!(clusters, findfirst(x->x==left, clusters))
+      deleteat!(clusters, findfirst(x->x==right, clusters))
+      push!(clusters, BoundingNode(left, right, superslab(bounding_slab(left), bounding_slab(right))))
     end
-    
-    return BoundingNode(left, right, superslab(bounding_slab(left), bounding_slab(right)))
+
+    return BoundingNode(clusters[1], clusters[2], superslab(bounding_slab(clusters[1]), bounding_slab(clusters[1])))
   end
 
   struct AxisRect <: Object
@@ -288,42 +305,6 @@ module Objects
     return superslab(bounding_slab(q.tri1), bounding_slab(q.tri2))
   end
 
-  struct Patch <: Object
-    points::Array{Vec3, 2}
-    rects::ObjectSet
-  end
-
-  function Patch(points::Array{Vec3, 2}, mat::Material)
-    rects = ObjectSet()
-    for j in 1:(size(points, 2)-1)
-      for i in 1:(size(points, 1)-1)
-        push!(rects, Quad(points[i, j], points[i, j + 1], points[i + 1, j + 1], points[i + 1, j],  mat))
-      end
-    end
-    return Patch(points, rects)
-  end
-
-  function hit(r::Ray, p::Patch, t::OpenInterval{Float32})
-    return hit(r, p.rects, t)
-  end
-
-  function bounding_slab(p::Patch)
-    return bounding_slab(p.rects)
-  end
-
-  struct PatchSet <: Object
-    patches::ObjectSet
-    PatchSet() = new(ObjectSet())
-  end
-
-  function hit(r::Ray, p::PatchSet, t::OpenInterval{Float32})
-    return hit(r, p.patches, t)
-  end
-
-  function bounding_slab(p::PatchSet)
-    return bounding_slab(p.patches)
-  end
-
   struct Box <: Object
     lower_left::Vec3
     upper_right::Vec3
@@ -349,6 +330,6 @@ module Objects
     return Slab(b.lower_left, b.upper_right)
   end
   
-  export Object, ObjectSet, Sphere, Slab, BoundingNode, AxisRect, Box, Tri, Quad, Patch, PatchSet
+  export Object, ObjectSet, Sphere, Slab, BoundingNode, AxisRect, Box, Tri, Quad
   export hit, make_bvh
 end
