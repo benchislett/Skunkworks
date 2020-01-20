@@ -145,9 +145,9 @@ module Objects
   function d(x::Object, y::Object) # Cluster distance function
     slab = superslab(bounding_slab(x), bounding_slab(y))
     l, w, h = slab.upper_right .- slab.lower_left
-    return 2 * ((l * w) + (w * h) + (l * h))
+    result = 2 * ((l * w) + (w * h) + (l * h))
+    return result
   end
-
 
   function make_bvh(world::ObjectSet) # Agglomerative Clustering
     clusters = copy(world)
@@ -228,6 +228,7 @@ module Objects
     v::Vec3
     normal::Vec3
     material::Material
+    slab::Slab
   end
 
   function Tri(a::Vec3, b::Vec3, c::Vec3, mat::Material)
@@ -235,8 +236,8 @@ module Objects
     v = c .- a
 
     normal = normalize(cross(u, v))
-
-    return Tri(a, b, c, u, v, normal, mat)
+    slab = Slab(min.(a, b, c) .- 0.001, max.(a, b, c) .+ 0.001)
+    return Tri(a, b, c, u, v, normal, mat, slab)
   end
 
   function hit(r::Ray, tri::Tri, t::OpenInterval{Float32}) # Moller-Trumbore
@@ -272,7 +273,7 @@ module Objects
   end
 
   function bounding_slab(tri::Tri)
-    return Slab(min.(tri.a, tri.b, tri.c) .- 0.001, max.(tri.a, tri.b, tri.c) .+ 0.001)
+    return tri.slab
   end
 
   struct Quad <: Object
