@@ -5,7 +5,7 @@ CUDAFLAGS= -arch=sm_35
 CPPFLAGS= -L/usr/local/cuda/lib64 -I/usr/local/cuda/include -lcudart -std=c++17 -L. -lbenrt
 CC=g++
 
-OBJECTS= vec3.o ray.o
+OBJECTS= vec3.o ray.o render.o
 
 default: libbenrt.a
 

@@ -1,11 +1,29 @@
 #include "rt.h"
 
+#define WIDTH 256
+#define HEIGHT 512
+
 int main()
 {
-  Vec3 a = {1.0, 1.0, 1.0};
-  Vec3 b = {2.0, -1.0, 3.0};
+  size_t idx;
+  int i,j;
+  float output[3*WIDTH*HEIGHT];
+  float r,g,b;
 
-  Vec3 c = a + b;
+  render(output, WIDTH, HEIGHT);
 
-  std::cout << c.x << " " << c.y << " " << c.z << std::endl;
+  std::cout << "P3\n" << WIDTH << " " << HEIGHT << "\n255\n";
+
+  for (j = 0; j < HEIGHT; j++)
+  {
+    for (i = 0; i < WIDTH; i++)
+    {
+      idx = 3 * (i + j * WIDTH);
+      r = output[idx + 0];
+      g = output[idx + 1];
+      b = output[idx + 2];
+
+      std::cout << (int)(255.99 * r) << " " << (int)(255.99 * g) << " " << (int)(255.99 * b) << std::endl;
+    }
+  }
 }
