@@ -20,5 +20,5 @@ libbenrt.a: $(OBJECTS)
 
 .PHONY: clean
 clean:
-	rm -f *.a *.o ./main
+	rm -f *.a *.out *.o ./main
 
