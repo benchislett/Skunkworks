@@ -15,9 +15,19 @@ Vec3 operator*(const Vec3 &a, const Vec3 &b)
   return {a.x * b.x, a.y * b.y, a.z * b.z};
 }
 
+Vec3 operator*(const Vec3 &a, float x)
+{
+  return {x * a.x, x * a.y, x * a.z};
+}
+
 Vec3 operator/(const Vec3 &a, const Vec3 &b)
 {
   return {a.x / b.x, a.y / b.y, a.z / b.z};
+}
+
+Vec3 operator/(const Vec3 &a, float x)
+{
+  return {a.x / x, a.y / x, a.z / x};
 }
 
 bool operator==(const Vec3 &a, const Vec3 &b)
@@ -49,4 +59,17 @@ float norm_sq(const Vec3 &a)
 float norm(const Vec3 &a)
 {
   return sqrt(norm_sq(a));
+}
+
+Vec3 unit(const Vec3 &a)
+{
+  return a / norm(a);
+}
+
+void make_unit(Vec3 *a)
+{
+  float n = norm(*a);
+  a->x /= n;
+  a->y /= n;
+  a->z /= n;
 }

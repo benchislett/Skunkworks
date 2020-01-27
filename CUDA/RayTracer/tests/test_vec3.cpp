@@ -21,7 +21,7 @@ TEST_CASE( "Vec3 -", "[Vec3][minus]" ) {
   REQUIRE( a - b == expected );
 }
 
-TEST_CASE( "Vec3 *", "[Vec3][mul]" ) {
+TEST_CASE( "Vec3 * Vec3", "[Vec3][mul]" ) {
   Vec3 a = {1.0, 0.0, 3.5324};
   Vec3 b = {99.91, 0.33, 2.33};
 
@@ -30,13 +30,31 @@ TEST_CASE( "Vec3 *", "[Vec3][mul]" ) {
   REQUIRE( a * b == expected );
 }
 
-TEST_CASE( "Vec3 /", "[Vec3][div]" ) {
+TEST_CASE( "Vec3 * float", "[Vec3][mul]" ) {
+  Vec3 a = {1.0, 0.0, 2.35342};
+  float scale = 3.2;
+
+  Vec3 expected = {3.2, 0.0, 7.530944};
+
+  REQUIRE( a * scale == expected );
+}
+
+TEST_CASE( "Vec3 / Vec3", "[Vec3][div]" ) {
   Vec3 a = {0.0, 3.0, 6.0};
   Vec3 b = {5.3, 7.0, 11.2};
 
   Vec3 expected = {0.0 / 5.3, 3.0 / 7.0, 6.0 / 11.2};
 
   REQUIRE( a / b == expected );
+}
+
+TEST_CASE( "Vec3 / float", "[Vec3][div]" ) {
+  Vec3 a = {1.0, 0.0, 2.35342};
+  float scale = 3.2;
+
+  Vec3 expected = {0.3125, 0.0, 0.73544375};
+
+  REQUIRE( a / scale == expected );
 }
 
 TEST_CASE( "Vec3 cross", "[Vec3][cross]" ) {
@@ -72,3 +90,21 @@ TEST_CASE( "Vec3 norm", "[Vec3][norm]" ) {
 
   REQUIRE( norm(a) == Approx( expected ) );
 }
+
+TEST_CASE( "Vec3 unit", "[Vec3][unit]" ) {
+  Vec3 a = {0.111, 2.0, 1.943};
+
+  Vec3 expected = {0.0397760815236, 0.71668615357834, 0.6962605982};
+
+  REQUIRE( unit(a) == expected );
+}
+
+TEST_CASE( "Vec3 make_unit", "[Vec3][make_unit]" ) {
+  Vec3 a = {0.111, 2.0, 1.943};
+
+  Vec3 expected = {0.0397760815236, 0.71668615357834, 0.6962605982};
+  make_unit(&a);
+
+  REQUIRE( a == expected );
+}
+

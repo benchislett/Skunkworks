@@ -20,7 +20,10 @@ typedef struct
 Vec3 operator+(const Vec3 &a, const Vec3& b);
 Vec3 operator-(const Vec3 &a, const Vec3 &b);
 Vec3 operator*(const Vec3 &a, const Vec3 &b);
+Vec3 operator*(const Vec3 &a, float x);
 Vec3 operator/(const Vec3 &a, const Vec3 &b);
+Vec3 operator/(const Vec3 &a, float x);
+
 std::ostream& operator<<(std::ostream& os, const Vec3 &a);
 bool operator==(const Vec3 &a, const Vec3 &b);
 
@@ -29,9 +32,18 @@ float norm_sq(const Vec3 &a);
 
 float dot(const Vec3 &a, const Vec3 &b);
 Vec3 cross(const Vec3 &a, const Vec3 &b);
+Vec3 unit(const Vec3 &a);
+void make_unit(Vec3 *a);
 
 // RAY
 
+typedef struct
+{
+  Vec3 from;
+  Vec3 d;
+} Ray;
+
+Vec3 ray_at(const Ray &r, float t);
 
 // RENDER
 
