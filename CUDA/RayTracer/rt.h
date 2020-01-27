@@ -4,6 +4,7 @@
 // MISC
 
 #include <iostream>
+#include <math.h>
 
 #define EPSILON 0.0001
 #define EQ(a,b) (fabsf(a-b)<EPSILON) 
@@ -44,6 +45,19 @@ typedef struct
 } Ray;
 
 Vec3 ray_at(const Ray &r, float t);
+
+// CAMERA
+
+typedef struct {
+  Vec3 location;
+  Vec3 lower_left_corner;
+  Vec3 horizontal;
+  Vec3 vertical;
+} Camera;
+
+Camera make_camera(const Vec3 &location, const Vec3 &target, const Vec3 &view_up, float fov_vertical, float aspect);
+
+Ray get_ray(const Camera &c, float u, float v);
 
 // RENDER
 
