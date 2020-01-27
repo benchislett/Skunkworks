@@ -37,14 +37,6 @@ function main()
   samples = 50
   img = zeros(Float32, 3, h, w)
 
-  camera_pos = Vec3(0.5, 0.5, 0.5)
-  camera_target = Vec3(0, 0.2, 0)
-  focus_dist = norm(camera_pos - camera_target)
-  aperture = 0.0f0
-  fov = Float32(pi / 9)
-
-  cam = Camera(camera_pos, camera_target, Vec3(0, 1, 0), fov, Float32(w / h), aperture, focus_dist)
-
   world = ObjectSet()
   
   red = Diffuse(ConstantTexture(Vec3(0.65, 0.05, 0.05)))
@@ -52,10 +44,27 @@ function main()
   green = Diffuse(ConstantTexture(Vec3(0.12, 0.45, 0.15)))
   light = Light(ConstantTexture(Vec3(14, 14, 14)))
 
+  br = 0.25f0 # Half Box Side Length
+  push!(world, Quad(Vec3(-br, -br, -br), Vec3(-br, -br, br), Vec3(br, -br, br), Vec3(br, -br, -br), white))
+  push!(world, Quad(Vec3(-br, -br, br), Vec3(-br, br, br), Vec3(br, br, br), Vec3(br, -br, br), white))
+  push!(world, Quad(Vec3(-br, br, -br), Vec3(-br, br, br), Vec3(br, br, br), Vec3(br, br, -br), white))
+  push!(world, Quad(Vec3(-br, -br, -br), Vec3(-br, br, -br), Vec3(-br, br, br), Vec3(-br, -br, br), green))
+  push!(world, Quad(Vec3(br, -br, -br), Vec3(br, -br, br), Vec3(br, br, br), Vec3(br, br, -br), red))
+
+  push!(world, Quad(Vec3(-br/2, br, -br/2), Vec3(-br/2, br, br/2), Vec3(br/2, br, br/2), Vec3(br/2, br, -br/2), light))
+
   loadOFF("data/bunny.off", world, white)
 
   world = make_bvh(world)
-  
+
+  camera_pos = Vec3(0, 0, -br)
+  camera_target = Vec3(0, 0, 0)
+  focus_dist = norm(camera_pos - camera_target)
+  aperture = 0.0f0
+  fov = Float32(2π/ 9)
+
+  cam = Camera(camera_pos, camera_target, Vec3(0, 1, 0), fov, Float32(w / h), aperture, focus_dist)
+
   try
     p = Progress(w * h, 1, "Rendering...")
     @threads for j in h:-1:1
