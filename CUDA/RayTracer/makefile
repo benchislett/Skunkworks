@@ -6,7 +6,7 @@ CPPFLAGS= -L/usr/local/cuda/lib64 -I/usr/local/cuda/include -lcudart -std=c++17 
 CC=g++
 
 OBJECTS= vec3.o ray.o render.o camera.o
-TEST_FILES= ./tests/test_vec3.cpp ./tests/test_ray.cpp
+TEST_FILES= ./tests/test_vec3.cpp ./tests/test_ray.cpp ./tests/test_camera.cpp
 
 default: libbenrt.a
 
