@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "../rt.h"
+#include "../rt.cuh"
 
 TEST_CASE( "Camera make_camera", "[Camera][make_camera]" ) {
   Vec3 location = {1.2, 3.1, 2.3};

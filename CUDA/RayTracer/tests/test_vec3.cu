@@ -1,7 +1,7 @@
 #define CATCH_CONFIG_MAIN
 #include "catch.hpp"
 
-#include "../rt.h"
+#include "../rt.cuh"
 
 TEST_CASE( "Vec3 +", "[Vec3][plus]" ) {
   Vec3 a = {1.0, 1.234, 419.9};

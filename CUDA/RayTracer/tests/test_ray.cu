@@ -1,6 +1,6 @@
 #include "catch.hpp"
 
-#include "../rt.h"
+#include "../rt.cuh"
 
 TEST_CASE( "Ray ray_at", "[Ray][ray_at]" ) {
   Vec3 origin = {0.1, 0.001, 0.0001};

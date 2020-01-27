@@ -1,6 +1,6 @@
-#include "rt.h"
+#include "rt.cuh"
 
-Vec3 ray_at(const Ray &r, float t)
+__host__ __device__ Vec3 ray_at(const Ray &r, float t)
 {
   Vec3 out = r.from + (r.d * t);
   return out;
