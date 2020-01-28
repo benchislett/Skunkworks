@@ -7,9 +7,11 @@
 #include <math.h>
 #include <cuda_runtime.h>
 
-#define EPSILON 0.0000001
-#define EQ(a,b) (fabsf(a-b)<EPSILON)
-#define ISZERO(a) (fabsf(a)<EPSILON)
+#define EPSILON 0.000001
+
+#define CMP_EPSILON 0.0001
+#define EQ(a,b) (fabsf(a-b)<CMP_EPSILON)
+#define ISZERO(a) (fabsf(a)<CMP_EPSILON)
 #define SIGN(a) (a<0?-1:(a>0?1:0))
 
 // VEC3
