@@ -91,6 +91,6 @@ typedef struct {
   // World w;
 } RenderParams;
 
-void render(float *host_out, const RenderParams &p);
+void render(float *host_out, const Tri world, const RenderParams &p);
 
 #endif

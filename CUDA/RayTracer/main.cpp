@@ -11,11 +11,12 @@ int main()
   output[3 * WIDTH * HEIGHT - 1] = 0.123;
   float r,g,b;
 
-  Camera c = make_camera((Vec3){1.0, 1.0, 1.0}, (Vec3){0.0, 0.0, 0.0}, (Vec3){0.0, 1.0, 0.0}, 40.0, (float)WIDTH / (float)HEIGHT);
+  Camera c = make_camera((Vec3){0.0, 0.0, -1.0}, (Vec3){0.0, 0.0, 0.0}, (Vec3){0.0, 1.0, 0.0}, 40.0, (float)WIDTH / (float)HEIGHT);
+  Tri world = {(Vec3){-0.1, -0.1, 0.0}, (Vec3){0.0, 0.1, 0.0}, (Vec3){0.1, -0.1, 0.0}};
   Vec3 background = {0.4, 0.4, 0.7};
   RenderParams p = {WIDTH, HEIGHT, c, background};
 
-  render(output, p);
+  render(output, world, p);
 
   std::cout << "P3\n" << WIDTH << " " << HEIGHT << "\n255\n";
 
