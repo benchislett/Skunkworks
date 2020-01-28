@@ -5,7 +5,7 @@ CUDAFLAGS= -arch=sm_61 -gencode=arch=compute_61,code=sm_61
 CPPFLAGS= -L/usr/local/cuda/lib64 -I/usr/local/cuda/include -lcudart -std=c++17 -L. -lbenrt
 CC=g++
 
-OBJECTS= vec3.o ray.o render.o camera.o
+OBJECTS= vec3.o ray.o render.o camera.o tri.o
 TEST_FILES= ./tests/test_vec3.cu ./tests/test_ray.cu ./tests/test_camera.cu
 
 default: libbenrt.a

@@ -7,8 +7,10 @@
 #include <math.h>
 #include <cuda_runtime.h>
 
-#define EPSILON 0.00001
+#define EPSILON 0.0000001
 #define EQ(a,b) (fabsf(a-b)<EPSILON)
+#define ISZERO(a) (fabsf(a)<EPSILON)
+#define SIGN(a) (a<0?-1:(a>0?1:0))
 
 // VEC3
 
@@ -45,6 +47,24 @@ typedef struct
 } Ray;
 
 __host__ __device__ Vec3 ray_at(const Ray &r, float t);
+
+// HIT LOGIC
+
+typedef struct {
+  float time;
+  Vec3 point;
+  Vec3 normal;
+} HitData;
+
+// TRIANGLE SURFACE
+
+typedef struct {
+  Vec3 a;
+  Vec3 b;
+  Vec3 c;
+} Tri;
+
+__host__ __device__ bool hit(const Ray &r, const Tri &t, HitData *h);
 
 // CAMERA
 
