@@ -48,10 +48,12 @@ __host__ __device__ bool hit(const Ray &r, const World &w, HitData *h)
 
   for (int i = 0; i < w.n; i++)
   {
-    if (hit(r, w.t[i], h) && h->time < closest) {
-      did_hit = true;
-      closest = h->time;
-      closest_record = *h;
+    if (hit(r, w.t[i], h)) {
+      if (h->time < closest) {
+        did_hit = true;
+        closest = h->time;
+        closest_record = *h;
+      }
     }
   }
 
