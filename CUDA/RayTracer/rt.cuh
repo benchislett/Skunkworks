@@ -3,7 +3,10 @@
 
 // MISC
 
+#include <string>
 #include <iostream>
+#include <stdio.h>
+#include <stdint.h>
 #include <math.h>
 #include <float.h>
 #include <cuda_runtime.h>
