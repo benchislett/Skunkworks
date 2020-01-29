@@ -39,3 +39,26 @@ __host__ __device__ bool hit(const Ray &r, const Tri &t, HitData *h)
 
   return true;
 }
+
+__host__ __device__ bool hit(const Ray &r, const World &w, HitData *h)
+{
+  bool did_hit = false;
+  float closest = FLT_MAX;
+  HitData closest_record;
+
+  for (int i = 0; i < w.n; i++)
+  {
+    if (hit(r, w.t[i], h) && h->time < closest) {
+      did_hit = true;
+      closest = h->time;
+      closest_record = *h;
+    }
+  }
+
+  if (did_hit) {
+    *h = closest_record;
+    return true;
+  } else {
+    return false;
+  }
+}

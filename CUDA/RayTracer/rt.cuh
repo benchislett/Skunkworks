@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <math.h>
+#include <float.h>
 #include <cuda_runtime.h>
 
 #define EPSILON 0.000001
@@ -13,6 +14,7 @@
 #define EQ(a,b) (fabsf(a-b)<CMP_EPSILON)
 #define ISZERO(a) (fabsf(a)<CMP_EPSILON)
 #define SIGN(a) (a<0?-1:(a>0?1:0))
+#define MIN(a,b) (a<b?a:b)
 
 // VEC3
 
@@ -50,14 +52,6 @@ typedef struct
 
 __host__ __device__ Vec3 ray_at(const Ray &r, float t);
 
-// HIT LOGIC
-
-typedef struct {
-  float time;
-  Vec3 point;
-  Vec3 normal;
-} HitData;
-
 // TRIANGLE SURFACE
 
 typedef struct {
@@ -66,7 +60,21 @@ typedef struct {
   Vec3 c;
 } Tri;
 
+// SURFACE LOGIC
+
+typedef struct {
+  int n;
+  Tri *t;
+} World;
+
+typedef struct {
+  float time;
+  Vec3 point;
+  Vec3 normal;
+} HitData;
+
 __host__ __device__ bool hit(const Ray &r, const Tri &t, HitData *h);
+__host__ __device__ bool hit(const Ray &r, const World &w, HitData *h);
 
 // CAMERA
 
@@ -88,9 +96,9 @@ typedef struct {
   int height;
   Camera cam;
   Vec3 background;
-  // World w;
+  World w;
 } RenderParams;
 
-void render(float *host_out, const Tri world, const RenderParams &p);
+void render(float *host_out, const RenderParams &p, World w);
 
 #endif
