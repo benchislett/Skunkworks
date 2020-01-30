@@ -28,7 +28,7 @@ __host__ __device__ bool hit(const Ray &r, const Tri &t, HitData *h)
 
   float time = f * dot(edge2, q);
 
-  if (time < EPSILON) return false;
+  if (time < 0.01) return false;
 
   h->point = ray_at(r, time);
   h->time = time;

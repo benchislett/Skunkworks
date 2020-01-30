@@ -1,7 +1,7 @@
 #include "rt.cuh"
 
 #define WIDTH 256
-#define HEIGHT 512
+#define HEIGHT 256
 
 World loadOFF(char *path)
 {
@@ -44,11 +44,11 @@ int main()
   size_t idx;
   int i,j;
   float output[3*WIDTH*HEIGHT];
-  output[3 * WIDTH * HEIGHT - 1] = 0.123;
   float r,g,b;
 
-  Camera c = make_camera((Vec3){0.0, 0.3, 0.0}, (Vec3){0.0, 0.0, 0.0}, (Vec3){0.0, 1.0, 0.0}, 40.0, (float)WIDTH / (float)HEIGHT);
-  World w = loadOFF("data/bunny.off");
+  Camera c = make_camera((Vec3){0.0, 0.0, 0.5}, (Vec3){0.0, 0.0, 0.0}, (Vec3){0.0, 1.0, 0.0}, 40.0, (float)WIDTH / (float)HEIGHT);
+  World w = loadOFF("data/dragon.off");
+  
   Vec3 background = {0.4, 0.4, 0.7};
   RenderParams p = {WIDTH, HEIGHT, c, background};
 

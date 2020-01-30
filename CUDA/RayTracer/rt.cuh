@@ -11,11 +11,11 @@
 #include <float.h>
 #include <cuda_runtime.h>
 
-#define EPSILON 0.000001
+#define EPSILON 0.00001
 
-#define CMP_EPSILON 0.0001
-#define EQ(a,b) (fabsf(a-b)<CMP_EPSILON)
-#define ISZERO(a) (fabsf(a)<CMP_EPSILON)
+#define CMP_EPSILON FLT_MIN
+#define EQ(a,b) (fabsf(a-b)<=CMP_EPSILON)
+#define ISZERO(a) (fabsf(a)<=CMP_EPSILON)
 #define SIGN(a) (a<0?-1:(a>0?1:0))
 #define MIN(a,b) (a<b?a:b)
 
