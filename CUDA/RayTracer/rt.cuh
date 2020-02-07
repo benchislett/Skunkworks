@@ -10,6 +10,7 @@
 #include <math.h>
 #include <float.h>
 #include <cuda_runtime.h>
+#include <curand_kernel.h>
 
 #define EPSILON 0.00001
 
@@ -90,13 +91,14 @@ typedef struct {
 
 Camera make_camera(const Vec3 &location, const Vec3 &target, const Vec3 &view_up, float fov_vertical, float aspect);
 
-__host__ __device__ Ray get_ray(const Camera &c, float u, float v);
+__host__ __device__ Ray get_ray(const Camera &c, float u, float v, curandState *rand_state);
 
 // RENDER
 
 typedef struct {
   int width;
   int height;
+  int samples;
   Camera cam;
   Vec3 background;
   World w;

@@ -1,7 +1,8 @@
 #include "rt.cuh"
 
-#define WIDTH 256
-#define HEIGHT 256
+#define WIDTH 128
+#define HEIGHT 128
+#define SAMPLES 64
 
 World loadOFF(char *path)
 {
@@ -46,11 +47,11 @@ int main()
   float output[3*WIDTH*HEIGHT];
   float r,g,b;
 
-  Camera c = make_camera((Vec3){0.0, 0.0, 0.5}, (Vec3){0.0, 0.0, 0.0}, (Vec3){0.0, 1.0, 0.0}, 40.0, (float)WIDTH / (float)HEIGHT);
+  Camera c = make_camera((Vec3){0.0, 0.08, 0.3}, (Vec3){0.0, 0.08, 0.0}, (Vec3){0.0, -1.0, 0.0}, 40.0, (float)WIDTH / (float)HEIGHT);
   World w = loadOFF("data/dragon.off");
   
   Vec3 background = {0.4, 0.4, 0.7};
-  RenderParams p = {WIDTH, HEIGHT, c, background};
+  RenderParams p = {WIDTH, HEIGHT, SAMPLES, c, background};
 
   render(output, p, w);
   free(w.t);
@@ -62,9 +63,9 @@ int main()
     for (i = 0; i < WIDTH; i++)
     {
       idx = 3 * (i + j * WIDTH);
-      r = output[idx + 0];
-      g = output[idx + 1];
-      b = output[idx + 2];
+      r = sqrt(output[idx + 0]);
+      g = sqrt(output[idx + 1]);
+      b = sqrt(output[idx + 2]);
 
       std::cout << (int)(255.99 * r) << " " << (int)(255.99 * g) << " " << (int)(255.99 * b) << std::endl;
     }
