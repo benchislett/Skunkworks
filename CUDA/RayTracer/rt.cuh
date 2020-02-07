@@ -19,6 +19,7 @@
 #define ISZERO(a) (fabsf(a)<=CMP_EPSILON)
 #define SIGN(a) (a<0?-1:(a>0?1:0))
 #define MIN(a,b) (a<b?a:b)
+#define MAX(a,b) (a>b?a:b)
 
 // VEC3
 
@@ -64,6 +65,15 @@ typedef struct {
   Vec3 c;
 } Tri;
 
+
+// BVH
+
+typedef struct {
+  Vec3 ur;
+  Vec3 ll;
+} AABB;
+
+
 // SURFACE LOGIC
 
 typedef struct {
@@ -77,6 +87,7 @@ typedef struct {
   Vec3 normal;
 } HitData;
 
+__host__ __device__ bool hit(const Ray &r, const AABB &s, HitData *h);
 __host__ __device__ bool hit(const Ray &r, const Tri &t, HitData *h);
 __host__ __device__ bool hit(const Ray &r, const World &w, HitData *h);
 
