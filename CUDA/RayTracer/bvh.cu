@@ -20,4 +20,14 @@ __host__ __device__ bool hit(const Ray &r, const AABB &s, HitData *h)
   return (0 < tmax) && (tmin < tmax);
 }
 
+AABB BoundingSlab(const Tri &t) {
+  float xmin = MIN(MIN(t.a.x, t.b.x), t.c.x);
+  float ymin = MIN(MIN(t.a.y, t.b.y), t.c.y);
+  float zmin = MIN(MIN(t.a.z, t.b.z), t.c.z);
 
+  float xmax = MAX(MAX(t.a.x, t.b.x), t.c.x);
+  float ymax = MAX(MAX(t.a.y, t.b.y), t.c.y);
+  float zmax = MAX(MAX(t.a.z, t.b.z), t.c.z);
+
+  return {{xmin, ymin, zmin}, {xmax, ymax, zmax}};
+}

@@ -2,7 +2,7 @@
 
 #include "../rt.cuh"
 
-TEST_CASE ( "AABB hit true" "[AABB][Ray][hit]" ) {
+TEST_CASE ( "AABB hit true", "[AABB][Ray][hit]" ) {
   Vec3 origin = {1.0, 1.0, 1.0};
   Vec3 direction = {2.0, -1.0, 3.0};
 
@@ -18,7 +18,7 @@ TEST_CASE ( "AABB hit true" "[AABB][Ray][hit]" ) {
   REQUIRE ( hit(r, slab, &rec) ); 
 }
 
-TEST_CASE ( "AABB hit false" "[AABB][Ray][hit]" ) {
+TEST_CASE ( "AABB hit false", "[AABB][Ray][hit]" ) {
   Vec3 origin = {1.0, 1.0, 1.0};
   Vec3 direction = {2.0, -1.0, 3.0};
 
@@ -32,4 +32,8 @@ TEST_CASE ( "AABB hit false" "[AABB][Ray][hit]" ) {
   HitData rec; // Unused
 
   REQUIRE ( !hit(r, slab, &rec) ); 
+}
+
+TEST_CASE( "AABB BoundingSlab", "[AABB][Tri][BoundingSlab]" ) {
+
 }

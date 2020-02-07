@@ -72,6 +72,16 @@ typedef struct {
   Vec3 ll;
 } AABB;
 
+AABB BoundingSlab(const Tri &t);
+
+typedef struct bn {
+  Tri t;
+  AABB slab;
+  struct bn *left;
+  struct bn *right;
+} BoundingNode;
+
+void initBoundingNode(Tri t, BoundingNode *bn);
 
 // SURFACE LOGIC
 
