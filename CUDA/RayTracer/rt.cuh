@@ -106,4 +106,10 @@ typedef struct {
 
 void render(float *host_out, const RenderParams &p, World w);
 
+// RANDOM
+
+__device__ Vec3 random_in_unit_sphere(curandState *r);
+
+__global__ void rand_init(const RenderParams p, curandState *r);
+
 #endif

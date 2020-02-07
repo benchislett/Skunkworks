@@ -1,17 +1,6 @@
 #include "rt.cuh"
 #define MAX_DEPTH 2
 
-__device__ Vec3 random_in_unit_sphere(curandState *r)
-{
-  Vec3 p;
-  Vec3 white = {1.0, 1.0, 1.0};
-  do {
-    p = (Vec3){curand_uniform(r), curand_uniform(r), curand_uniform(r)} * 2.0;
-    p = p - white;
-  } while (norm_sq(p) >= 1.0);
-  return p;
-}
-
 __device__ Vec3 get_color(const Ray &r, const World &w, const RenderParams &p, curandState *rand_state)
 {
   Vec3 color = {1.0, 1.0, 1.0};
@@ -32,18 +21,6 @@ __device__ Vec3 get_color(const Ray &r, const World &w, const RenderParams &p, c
   color = color * ((white * (1.0-t)) + (p.background * t));
 
   return color;
-}
-
-__global__ void render_init(const RenderParams p, curandState *rand_state)
-{
-  int i = threadIdx.x + blockIdx.x * blockDim.x;
-  int j = threadIdx.y + blockIdx.y * blockDim.y;
-
-  if ((i >= p.width) || (j >= p.height)) return;
-
-  int idx = i + p.width * j;
-
-  curand_init(2020, idx, 0, &rand_state[idx]);
 }
 
 __global__ void render_kernel(float *out, const World w, const RenderParams p, curandState *rand_state)
@@ -97,7 +74,7 @@ void render(float *host_out, const RenderParams &p, World w)
   curandState *rand_state;
   cudaMalloc((void **)&rand_state, imgsize * sizeof(curandState));
 
-  render_init<<<blocks, threads>>>(p, rand_state);
+  rand_init<<<blocks, threads>>>(p, rand_state);
   render_kernel<<<blocks, threads>>>(device_out, w, p, rand_state);
 
   cudaDeviceSynchronize();
