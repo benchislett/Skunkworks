@@ -14,9 +14,8 @@
 
 #define EPSILON 0.00001
 
-#define CMP_EPSILON FLT_MIN
-#define EQ(a,b) (fabsf(a-b)<=CMP_EPSILON)
-#define ISZERO(a) (fabsf(a)<=CMP_EPSILON)
+#define EQ(a,b) (fabsf(a-b)<=EPSILON)
+#define ISZERO(a) (fabsf(a)<=EPSILON)
 #define SIGN(a) (a<0?-1:(a>0?1:0))
 #define MIN(a,b) (a<b?a:b)
 #define MAX(a,b) (a>b?a:b)
@@ -102,7 +101,7 @@ typedef struct {
 
 Camera make_camera(const Vec3 &location, const Vec3 &target, const Vec3 &view_up, float fov_vertical, float aspect);
 
-__host__ __device__ Ray get_ray(const Camera &c, float u, float v, curandState *rand_state);
+__host__ __device__ Ray get_ray(const Camera &c, float u, float v);
 
 // RENDER
 

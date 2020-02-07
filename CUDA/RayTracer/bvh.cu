@@ -17,5 +17,7 @@ __host__ __device__ bool hit(const Ray &r, const AABB &s, HitData *h)
   float tmin = MAX(MAX(MIN(t1, t2), MIN(t3, t4)), MIN(t5, t6));
   float tmax = MIN(MIN(MAX(t1, t2), MAX(t3, t4)), MAX(t5, t6));
 
-  if (0 < tmax && tmin < tmax) return true;
+  return (0 < tmax) && (tmin < tmax);
 }
+
+

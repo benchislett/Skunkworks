@@ -17,7 +17,7 @@ Camera make_camera(const Vec3 &location, const Vec3 &target, const Vec3 &view_up
   return {location, lower_left_corner, horizontal, vertical};
 }
 
-__host__ __device__ Ray get_ray(const Camera &c, float u, float v, curandState *rand_state)
+__host__ __device__ Ray get_ray(const Camera &c, float u, float v)
 {
   return {c.location, c.lower_left_corner + (c.horizontal * u) + (c.vertical * v) - c.location};
 }

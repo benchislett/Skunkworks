@@ -43,7 +43,7 @@ __global__ void render_kernel(float *out, const World w, const RenderParams p, c
     float u = irand / (float)p.width;
     float v = jrand / (float)p.height;
 
-    Ray r = get_ray(p.cam, u, v, &local_rand_state);
+    Ray r = get_ray(p.cam, u, v);
     color = color + get_color(r, w, p, &local_rand_state);
   }
   color = color / (float)p.samples;
