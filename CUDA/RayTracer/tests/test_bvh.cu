@@ -34,6 +34,11 @@ TEST_CASE ( "AABB hit false", "[AABB][Ray][hit]" ) {
   REQUIRE ( !hit(r, slab, &rec) ); 
 }
 
-TEST_CASE( "AABB BoundingSlab", "[AABB][Tri][BoundingSlab]" ) {
+TEST_CASE( "AABB bounding_slab", "[AABB][Tri][bounding_slab]" ) {
+  Tri t = {{1.0, 2.0, 3.0}, {10.0, -1.0, 2.0}, {-5.0, 3.0, 9.0}};
+  AABB slab = bounding_slab(t);
 
+  REQUIRE( slab.ll == (Vec3){-5.0, -1.0, 2.0} );
+  REQUIRE( slab.ur == (Vec3){10.0, 3.0, 9.0} );
 }
+

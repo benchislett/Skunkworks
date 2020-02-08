@@ -68,11 +68,11 @@ typedef struct {
 // BVH
 
 typedef struct {
-  Vec3 ur;
   Vec3 ll;
+  Vec3 ur;
 } AABB;
 
-AABB BoundingSlab(const Tri &t);
+AABB bounding_slab(const Tri &t);
 
 typedef struct bn {
   Tri t;
@@ -81,7 +81,7 @@ typedef struct bn {
   struct bn *right;
 } BoundingNode;
 
-void initBoundingNode(Tri t, BoundingNode *bn);
+void init_bounding_node(Tri t, BoundingNode *bn);
 
 // SURFACE LOGIC
 
