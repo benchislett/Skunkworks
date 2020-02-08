@@ -65,6 +65,10 @@ void render(float *host_out, const RenderParams &p, World w)
   cudaMemcpy(device_tris, w.t, w.n * sizeof(Tri), cudaMemcpyHostToDevice);
   w.t = device_tris;
 
+  BoundingNode *device_nodes;
+  cudaMalloc((void **)&device_nodes, 2 * w.n * sizeof(BoundingNode));
+  // To Be Continued
+
   int tx = 8;
   int ty = 8;
 

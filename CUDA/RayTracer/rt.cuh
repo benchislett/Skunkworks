@@ -81,7 +81,7 @@ typedef struct bn {
   struct bn *right;
 } BoundingNode;
 
-// SURFACE LOGIC
+// INTERSECTION LOGIC
 
 typedef struct {
   int n;
