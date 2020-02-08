@@ -72,16 +72,14 @@ typedef struct {
   Vec3 ur;
 } AABB;
 
-AABB bounding_slab(const Tri &t);
+__host__ __device__ AABB bounding_slab(const Tri &t);
 
 typedef struct bn {
-  Tri t;
   AABB slab;
+  Tri *t;
   struct bn *left;
   struct bn *right;
 } BoundingNode;
-
-void init_bounding_node(Tri t, BoundingNode *bn);
 
 // SURFACE LOGIC
 
@@ -89,6 +87,11 @@ typedef struct {
   int n;
   Tri *t;
 } World;
+
+typedef struct {
+  int n;
+  BoundingNode *nodes; // Should be contiguous, with root as first node
+} BVHWorld;
 
 typedef struct {
   float time;
@@ -99,6 +102,8 @@ typedef struct {
 __host__ __device__ bool hit(const Ray &r, const AABB &s, HitData *h);
 __host__ __device__ bool hit(const Ray &r, const Tri &t, HitData *h);
 __host__ __device__ bool hit(const Ray &r, const World &w, HitData *h);
+__host__ __device__ bool hit(const Ray &r, const BoundingNode &node, HitData *h);
+__host__ __device__ bool hit(const Ray &r, const BVHWorld &w, HitData *h);
 
 // CAMERA
 

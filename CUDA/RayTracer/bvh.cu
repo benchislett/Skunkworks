@@ -20,6 +20,36 @@ __host__ __device__ bool hit(const Ray &r, const AABB &s, HitData *h)
   return (0 < tmax) && (tmin < tmax);
 }
 
+__host__ __device__ bool hit(const Ray &r, const BoundingNode &node, HitData *h) {
+  if (node.left == NULL && node.right == NULL) return hit(r, *(node.t), h);
+  if (node.left == NULL) return hit(r, *(node.right), h);
+  if (node.right == NULL) return hit(r, *(node.left), h);
+
+  if (hit(r, node.slab, h)) {
+    HitData left_record, right_record;
+    bool hit_left = hit(r, *(node.left), &left_record);
+    bool hit_right = hit(r, *(node.right), &right_record);
+
+    if (hit_left && hit_right) {
+      if (left_record.time < right_record.time) *h = left_record;
+      else *h = right_record;
+      return true;
+    } else if (hit_left) {
+      *h = left_record;
+      return true;
+    } else if (hit_right) {
+      *h = right_record;
+      return true;
+    }
+    return false;
+  }
+  return false;
+}
+
+__host__ __device__ bool hit(const Ray &r, const BVHWorld &w, HitData *h) {
+  return hit(r, w.nodes[0], h);
+}
+
 __host__ __device__ AABB bounding_slab(const Tri &t) {
   float xmin = MIN(MIN(t.a.x, t.b.x), t.c.x);
   float ymin = MIN(MIN(t.a.y, t.b.y), t.c.y);
