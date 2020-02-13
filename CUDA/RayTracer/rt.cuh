@@ -75,6 +75,8 @@ typedef struct {
 __host__ __device__ AABB bounding_slab(const Tri &t);
 __host__ __device__ AABB bounding_slab(const AABB &s1, const AABB &s2);
 
+__host__ __device__ float SAH(const AABB &s);
+
 typedef struct bn {
   AABB slab;
   Tri *t;
