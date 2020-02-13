@@ -74,7 +74,7 @@ __host__ __device__ AABB bounding_slab(const AABB &s1, const AABB &s2) {
   return {{ll_x, ll_y, ll_z}, {ur_x, ur_y, ur_z}};
 }
 
-__host__ __device__ float SAH(const AABB &s) {
+__host__ __device__ float SA(const AABB &s) {
   float width = s.ur.x - s.ll.x;
   float height = s.ur.y - s.ll.y;
   float depth = s.ur.z - s.ll.z;
