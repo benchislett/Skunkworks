@@ -61,3 +61,15 @@ __host__ __device__ AABB bounding_slab(const Tri &t) {
 
   return {{xmin, ymin, zmin}, {xmax, ymax, zmax}};
 }
+
+__host__ __device__ AABB bounding_slab(const AABB &s1, const AABB &s2) {
+  float ll_x = MIN(s1.ll.x, s2.ll.x);
+  float ll_y = MIN(s1.ll.y, s2.ll.y);
+  float ll_z = MIN(s1.ll.z, s2.ll.z);
+
+  float ur_x = MAX(s1.ur.x, s2.ur.x);
+  float ur_y = MAX(s1.ur.y, s2.ur.y);
+  float ur_z = MAX(s1.ur.z, s2.ur.z);
+
+  return {{ll_x, ll_y, ll_z}, {ur_x, ur_y, ur_z}};
+}
