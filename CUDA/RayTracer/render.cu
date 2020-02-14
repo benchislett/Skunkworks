@@ -53,6 +53,52 @@ __global__ void render_kernel(float *out, const World w, const RenderParams p, c
   out[idx + 2] = color.z;
 }
 
+__global__ void populate_nodes(Tri *tris, BoundingNode *nodes, int n, int bn) {
+  int i = threadIdx.x + blockIdx.x * blockDim.x;
+
+  if (i >= bn) return;
+
+  if (bn - i <= n) {
+    nodes[i].slab = bounding_slab(tris[bn - i - 1]);
+    nodes[i].t = (tris + bn - i - 1);
+    nodes[i].left = NULL;
+    nodes[i].right = NULL;
+    return;
+  }
+
+  int left = 2 * i + 1;
+  int right = 2 * i + 2;
+
+  if (left < bn && right < bn) {
+    nodes[i].t = NULL;
+    nodes[i].left = (nodes + left);
+    nodes[i].right = (nodes + right);
+  } else if (left < bn) {
+    nodes[i].t = NULL;
+    nodes[i].left = (nodes + left);
+    nodes[i].right = NULL;
+  } else if (right < bn) {
+    nodes[i].t = NULL;
+    nodes[i].left = NULL;
+    nodes[i].right = (nodes + right);
+  }
+}
+
+__global__ void compute_aabbs(BoundingNode *nodes, int lower, int upper) {
+  int i = threadIdx.x + blockIdx.x * blockDim.x;
+  
+  if (i < lower || i >= upper) return;
+
+  if (nodes[i].left == NULL && nodes[i].right == NULL) return;
+  else if (nodes[i].left == NULL) {
+    nodes[i].slab = nodes[i].right->slab;
+  } else if (nodes[i].right == NULL) {
+    nodes[i].slab = nodes[i].left->slab;
+  } else {
+    nodes[i].slab = bounding_slab(nodes[i].left->slab, nodes[i].right->slab);
+  }
+}
+
 void render(float *host_out, const RenderParams &p, World w)
 {
   int imgsize = 3 * p.width * p.height;
@@ -65,12 +111,21 @@ void render(float *host_out, const RenderParams &p, World w)
   cudaMemcpy(device_tris, w.t, w.n * sizeof(Tri), cudaMemcpyHostToDevice);
   w.t = device_tris;
 
-  BoundingNode *device_nodes;
-  cudaMalloc((void **)&device_nodes, 2 * w.n * sizeof(BoundingNode));
-  // To Be Continued
+  //BoundingNode *device_nodes;
+  //cudaMalloc((void **)&device_nodes, 2 * w.n * sizeof(BoundingNode));
 
   int tx = 8;
   int ty = 8;
+  
+  //populate_nodes<<<2 * w.n / tx + 1, tx>>>(device_tris, device_nodes, w.n, 2 * w.n);
+
+  //int acc = w.n;
+  //while (acc > 0) {
+    //compute_aabbs<<<acc / 2 / tx + 1, tx>>>(device_nodes, acc / 2, acc);
+
+    //acc /= 2;
+  //}
+  //cudaDeviceSynchronize();
 
   dim3 blocks(p.width / tx + 1, p.height / ty + 1);
   dim3 threads(tx, ty);
