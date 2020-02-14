@@ -11,5 +11,5 @@ TEST_CASE( "Ray ray_at", "[Ray][ray_at]" ) {
 
   Vec3 expected = {61.8, 48.127, 24.69244};
 
-  REQUIRE( ray_at(r, time) == expected );
+  REQUIRE( test_eq(ray_at(r, time), expected) );
 }

@@ -12,8 +12,10 @@
 #include <cuda_runtime.h>
 #include <curand_kernel.h>
 
-#define EPSILON 0.00001
+#define TEST_EPSILON 0.00001
+#define EPSILON FLT_MIN
 
+#define TEST_EQ(a,b) (fabsf(a-b)<=TEST_EPSILON)
 #define EQ(a,b) (fabsf(a-b)<=EPSILON)
 #define ISZERO(a) (fabsf(a)<=EPSILON)
 #define SIGN(a) (a<0?-1:(a>0?1:0))
@@ -37,6 +39,8 @@ __host__ __device__ Vec3 operator/(const Vec3 &a, float x);
 
 std::ostream& operator<<(std::ostream& os, const Vec3 &a);
 __host__ __device__ bool operator==(const Vec3 &a, const Vec3 &b);
+
+__host__ __device__ bool test_eq(const Vec3 &a, const Vec3 &b);
 
 __host__ __device__ float norm(const Vec3 &a);
 __host__ __device__ float norm_sq(const Vec3 &a);

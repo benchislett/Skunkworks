@@ -22,8 +22,8 @@ TEST_CASE( "Tri hit", "[Tri][Ray][hit]" ) {
   Vec3 normal = {0.707107, -0.707107, 0.0};
 
   REQUIRE( res == true );
-  REQUIRE( rec.point == point );
-  REQUIRE( rec.normal == normal );
+  REQUIRE( test_eq(rec.point, point) );
+  REQUIRE( test_eq(rec.normal, normal) );
   REQUIRE( rec.time == Approx( 1.5 ) );
 }
 
@@ -50,6 +50,6 @@ TEST_CASE( "World hit", "[World][Tri][hit]" ) {
 
   REQUIRE( hitAll == true );
   REQUIRE( h4.time == Approx( 2.43408 ) );
-  REQUIRE( h4.point == hit_pt );
-  REQUIRE( h4.normal == normal );
+  REQUIRE( test_eq(h4.point, hit_pt) );
+  REQUIRE( test_eq(h4.normal, normal) );
 }

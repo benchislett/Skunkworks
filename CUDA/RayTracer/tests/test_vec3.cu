@@ -9,7 +9,7 @@ TEST_CASE( "Vec3 +", "[Vec3][plus]" ) {
 
   Vec3 expected = {3.0, 4.234, 421.09};
 
-  REQUIRE( a + b == expected );
+  REQUIRE( test_eq(a + b, expected) );
 }
 
 TEST_CASE( "Vec3 -", "[Vec3][minus]" ) {
@@ -18,7 +18,7 @@ TEST_CASE( "Vec3 -", "[Vec3][minus]" ) {
 
   Vec3 expected = {12.5734, -6533.2189, -764.7323};
 
-  REQUIRE( a - b == expected );
+  REQUIRE( test_eq(a - b, expected) );
 }
 
 TEST_CASE( "Vec3 * Vec3", "[Vec3][mul]" ) {
@@ -27,7 +27,7 @@ TEST_CASE( "Vec3 * Vec3", "[Vec3][mul]" ) {
 
   Vec3 expected = {99.91, 0.0, 8.230492};
 
-  REQUIRE( a * b == expected );
+  REQUIRE( test_eq(a * b, expected) );
 }
 
 TEST_CASE( "Vec3 * float", "[Vec3][mul]" ) {
@@ -36,7 +36,7 @@ TEST_CASE( "Vec3 * float", "[Vec3][mul]" ) {
 
   Vec3 expected = {3.2, 0.0, 7.530944};
 
-  REQUIRE( a * scale == expected );
+  REQUIRE( test_eq(a * scale, expected) );
 }
 
 TEST_CASE( "Vec3 / Vec3", "[Vec3][div]" ) {
@@ -45,7 +45,7 @@ TEST_CASE( "Vec3 / Vec3", "[Vec3][div]" ) {
 
   Vec3 expected = {0.0 / 5.3, 3.0 / 7.0, 6.0 / 11.2};
 
-  REQUIRE( a / b == expected );
+  REQUIRE( test_eq(a / b, expected) );
 }
 
 TEST_CASE( "Vec3 / float", "[Vec3][div]" ) {
@@ -54,7 +54,7 @@ TEST_CASE( "Vec3 / float", "[Vec3][div]" ) {
 
   Vec3 expected = {0.3125, 0.0, 0.73544375};
 
-  REQUIRE( a / scale == expected );
+  REQUIRE( test_eq(a / scale, expected) );
 }
 
 TEST_CASE( "Vec3 cross", "[Vec3][cross]" ) {
@@ -63,7 +63,7 @@ TEST_CASE( "Vec3 cross", "[Vec3][cross]" ) {
 
   Vec3 expected = {-5.3951, 10.9105, -3.855};
 
-  REQUIRE( cross(a, b) == expected );
+  REQUIRE( test_eq(cross(a, b), expected) );
 }
 
 TEST_CASE( "Vec3 dot", "[Vec3][dot]" ) {
@@ -96,7 +96,7 @@ TEST_CASE( "Vec3 unit", "[Vec3][unit]" ) {
 
   Vec3 expected = {0.0397760815236, 0.71668615357834, 0.6962605982};
 
-  REQUIRE( unit(a) == expected );
+  REQUIRE( test_eq(unit(a), expected) );
 }
 
 TEST_CASE( "Vec3 make_unit", "[Vec3][make_unit]" ) {
@@ -105,6 +105,6 @@ TEST_CASE( "Vec3 make_unit", "[Vec3][make_unit]" ) {
   Vec3 expected = {0.0397760815236, 0.71668615357834, 0.6962605982};
   make_unit(&a);
 
-  REQUIRE( a == expected );
+  REQUIRE( test_eq(a, expected) );
 }
 

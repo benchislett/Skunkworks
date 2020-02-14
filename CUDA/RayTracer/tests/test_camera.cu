@@ -12,9 +12,9 @@ TEST_CASE( "Camera make_camera", "[Camera][make_camera]" ) {
   Camera c = make_camera(location, target, view_up, fov_vertical, aspect);
 
   REQUIRE( c.location == location );
-  REQUIRE( c.lower_left_corner == (Vec3){0.67521787, 2.0488322, 2.5240345} );
-  REQUIRE( c.horizontal == (Vec3){0.8362069, 0.0, -0.7021585} );
-  REQUIRE( c.vertical == (Vec3){-0.40953973, 0.35256082, -0.48772457} );
+  REQUIRE( test_eq(c.lower_left_corner, (Vec3){0.67521787, 2.0488322, 2.5240345}) );
+  REQUIRE( test_eq(c.horizontal, (Vec3){0.8362069, 0.0, -0.7021585}) );
+  REQUIRE( test_eq(c.vertical, (Vec3){-0.40953973, 0.35256082, -0.48772457}) );
 }
 
 TEST_CASE( "Camera get_ray", "[Camera][get_ray]" ) {
@@ -22,6 +22,6 @@ TEST_CASE( "Camera get_ray", "[Camera][get_ray]" ) {
 
   Ray r = get_ray(c, 0.5, 0.65);
 
-  REQUIRE( r.from == (Vec3){1.2, 3.1, 2.3} );
-  REQUIRE( r.d == (Vec3){-0.458641785, -1.01106403, -0.54619978} );
+  REQUIRE( test_eq(r.from, (Vec3){1.2, 3.1, 2.3}) );
+  REQUIRE( test_eq(r.d, (Vec3){-0.458641785, -1.01106403, -0.54619978}) );
 }

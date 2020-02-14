@@ -1,7 +1,7 @@
 #include "rt.cuh"
 #define MAX_DEPTH 2
 
-__device__ Vec3 get_color(const Ray &r, const BVHWorld &w, const RenderParams &p, curandState *rand_state)
+__device__ Vec3 get_color(const Ray &r, const World &w, const RenderParams &p, curandState *rand_state)
 {
   Vec3 color = {1.0, 1.0, 1.0};
   const Vec3 white = {1.0, 1.0, 1.0};
@@ -23,7 +23,7 @@ __device__ Vec3 get_color(const Ray &r, const BVHWorld &w, const RenderParams &p
   return color;
 }
 
-__global__ void render_kernel(float *out, const BVHWorld w, const RenderParams p, curandState *rand_state)
+__global__ void render_kernel(float *out, const World w, const RenderParams p, curandState *rand_state)
 {
   int i = threadIdx.x + blockIdx.x * blockDim.x;
   int j = threadIdx.y + blockIdx.y * blockDim.y;
@@ -135,7 +135,7 @@ void render(float *host_out, const RenderParams &p, World w)
   cudaMalloc((void **)&rand_state, imgsize * sizeof(curandState));
 
   rand_init<<<blocks, threads>>>(p, rand_state);
-  render_kernel<<<blocks, threads>>>(device_out, bw, p, rand_state);
+  render_kernel<<<blocks, threads>>>(device_out, w, p, rand_state);
 
   cudaDeviceSynchronize();
 

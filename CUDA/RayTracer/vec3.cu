@@ -35,6 +35,10 @@ __host__ __device__ bool operator==(const Vec3 &a, const Vec3 &b)
   return EQ(a.x, b.x) && EQ(a.y, b.y) && EQ(a.z, b.z);
 }
 
+__host__ __device__ bool test_eq(const Vec3 &a, const Vec3 &b) {
+  return TEST_EQ(a.x, b.x) && TEST_EQ(a.y, b.y) && TEST_EQ(a.z, b.z);
+}
+
 std::ostream& operator<<(std::ostream& os, const Vec3 &a)
 {
   os << "Vec3(" << a.x << ", " << a.y << ", " << a.z << ")";
