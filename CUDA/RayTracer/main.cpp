@@ -1,7 +1,7 @@
 #include "rt.cuh"
 
-#define WIDTH 64
-#define HEIGHT 64
+#define WIDTH 128
+#define HEIGHT 128
 #define SAMPLES 1
 
 World loadOFF(char *path)

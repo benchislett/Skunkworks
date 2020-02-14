@@ -93,6 +93,7 @@ typedef struct {
 
 typedef struct {
   int n;
+  int bn;
   BoundingNode *nodes; // Should be contiguous, with root as first node
 } BVHWorld;
 

@@ -1,7 +1,7 @@
 #include "rt.cuh"
 #define MAX_DEPTH 2
 
-__device__ Vec3 get_color(const Ray &r, const World &w, const RenderParams &p, curandState *rand_state)
+__device__ Vec3 get_color(const Ray &r, const BVHWorld &w, const RenderParams &p, curandState *rand_state)
 {
   Vec3 color = {1.0, 1.0, 1.0};
   const Vec3 white = {1.0, 1.0, 1.0};
@@ -23,7 +23,7 @@ __device__ Vec3 get_color(const Ray &r, const World &w, const RenderParams &p, c
   return color;
 }
 
-__global__ void render_kernel(float *out, const World w, const RenderParams p, curandState *rand_state)
+__global__ void render_kernel(float *out, const BVHWorld w, const RenderParams p, curandState *rand_state)
 {
   int i = threadIdx.x + blockIdx.x * blockDim.x;
   int j = threadIdx.y + blockIdx.y * blockDim.y;
@@ -32,11 +32,10 @@ __global__ void render_kernel(float *out, const World w, const RenderParams p, c
 
   int idx = 3 * (i + p.width * j);
   curandState local_rand_state = rand_state[idx / 3];
-  
+
   Vec3 color = {0.0, 0.0, 0.0};
   for (int c = 0; c < p.samples; c++)
   {
-  
     float irand = (float)i + curand_uniform(&local_rand_state);
     float jrand = (float)j + curand_uniform(&local_rand_state);
 
@@ -111,21 +110,23 @@ void render(float *host_out, const RenderParams &p, World w)
   cudaMemcpy(device_tris, w.t, w.n * sizeof(Tri), cudaMemcpyHostToDevice);
   w.t = device_tris;
 
-  //BoundingNode *device_nodes;
-  //cudaMalloc((void **)&device_nodes, 2 * w.n * sizeof(BoundingNode));
+  BoundingNode *device_nodes;
+  cudaMalloc((void **)&device_nodes, 2 * w.n * sizeof(BoundingNode));
 
   int tx = 8;
   int ty = 8;
   
-  //populate_nodes<<<2 * w.n / tx + 1, tx>>>(device_tris, device_nodes, w.n, 2 * w.n);
+  populate_nodes<<<2 * w.n / tx + 1, tx>>>(device_tris, device_nodes, w.n, 2 * w.n);
 
-  //int acc = w.n;
-  //while (acc > 0) {
-    //compute_aabbs<<<acc / 2 / tx + 1, tx>>>(device_nodes, acc / 2, acc);
+  int acc = w.n;
+  while (acc > 0) {
+    compute_aabbs<<<acc / 2 / tx + 1, tx>>>(device_nodes, acc / 2, acc);
 
-    //acc /= 2;
-  //}
-  //cudaDeviceSynchronize();
+    acc /= 2;
+  }
+  cudaDeviceSynchronize();
+
+  BVHWorld bw = {w.n, 2 * w.n, device_nodes};
 
   dim3 blocks(p.width / tx + 1, p.height / ty + 1);
   dim3 threads(tx, ty);
