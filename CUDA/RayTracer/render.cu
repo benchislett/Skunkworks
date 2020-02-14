@@ -135,7 +135,7 @@ void render(float *host_out, const RenderParams &p, World w)
   cudaMalloc((void **)&rand_state, imgsize * sizeof(curandState));
 
   rand_init<<<blocks, threads>>>(p, rand_state);
-  render_kernel<<<blocks, threads>>>(device_out, w, p, rand_state);
+  render_kernel<<<blocks, threads>>>(device_out, bw, p, rand_state);
 
   cudaDeviceSynchronize();
 
