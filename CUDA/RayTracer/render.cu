@@ -83,6 +83,36 @@ __global__ void populate_bvh(Tri *t, BoundingNode *nodes, int n, int bn, int low
   }
 }
 
+void populate_bvh_cpu(Tri *t, BoundingNode *nodes, int n, int bn) {
+  int left, right;
+  for (int i = bn - 1; i >= 0; i--) {
+    left = 2 * i + 1;
+    right = 2 * i + 2;
+
+    if (left < bn && right < bn) {
+      nodes[i].left = &nodes[left];
+      nodes[i].right = &nodes[right];
+      nodes[i].slab = bounding_slab(nodes[left].slab, nodes[right].slab);
+      nodes[i].t = NULL;
+    } else if (left < bn) {
+      nodes[i].left = &nodes[left];
+      nodes[i].right = NULL;
+      nodes[i].slab = nodes[left].slab;
+      nodes[i].t = NULL;
+    } else if (right < bn) {
+      nodes[i].left = NULL;
+      nodes[i].right = &nodes[right];
+      nodes[i].slab = nodes[right].slab;
+      nodes[i].t = NULL;
+    } else {
+      nodes[i].left = NULL;
+      nodes[i].right = NULL;
+      nodes[i].slab = bounding_slab(t[i - n]);
+      nodes[i].t = &t[i - n];
+    }
+  }
+}
+
 void render(float *host_out, const RenderParams &p, World w)
 {
   int imgsize = 3 * p.width * p.height;
@@ -98,8 +128,8 @@ void render(float *host_out, const RenderParams &p, World w)
   BoundingNode *device_nodes;
   cudaMallocManaged((void **)&device_nodes, 2 * w.n * sizeof(BoundingNode));
 
-  int tx = 8;
-  int ty = 8;
+  int tx = 16;
+  int ty = 16;
 
   cudaDeviceSynchronize();
 
