@@ -21,9 +21,15 @@ __host__ __device__ bool hit(const Ray &r, const AABB &s, HitData *h)
 }
 
 __host__ __device__ bool hit(const Ray &r, const BoundingNode &node, HitData *h) {
-  if (node.left == NULL && node.right == NULL) return hit(r, *(node.t), h);
-  if (node.left == NULL) return hit(r, *(node.right), h);
-  if (node.right == NULL) return hit(r, *(node.left), h);
+  if (node.left == NULL && node.right == NULL) {
+    return hit(r, *(node.t), h);
+  }
+  if (node.left == NULL) {
+    return hit(r, *(node.right), h);
+  }
+  if (node.right == NULL) {
+    return hit(r, *(node.left), h);
+  }
 
   if (hit(r, node.slab, h)) {
     HitData left_record, right_record;

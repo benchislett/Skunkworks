@@ -1,7 +1,7 @@
 #include "rt.cuh"
-#define MAX_DEPTH 2
+#define MAX_DEPTH 1
 
-__device__ Vec3 get_color(const Ray &r, const World &w, const RenderParams &p, curandState *rand_state)
+__device__ Vec3 get_color(const Ray &r, const BVHWorld &w, const RenderParams &p, curandState *rand_state)
 {
   Vec3 color = {1.0, 1.0, 1.0};
   const Vec3 white = {1.0, 1.0, 1.0};
@@ -23,7 +23,7 @@ __device__ Vec3 get_color(const Ray &r, const World &w, const RenderParams &p, c
   return color;
 }
 
-__global__ void render_kernel(float *out, const World w, const RenderParams p, curandState *rand_state)
+__global__ void render_kernel(float *out, const BVHWorld w, const RenderParams p, curandState *rand_state)
 {
   int i = threadIdx.x + blockIdx.x * blockDim.x;
   int j = threadIdx.y + blockIdx.y * blockDim.y;
@@ -52,49 +52,34 @@ __global__ void render_kernel(float *out, const World w, const RenderParams p, c
   out[idx + 2] = color.z;
 }
 
-__global__ void populate_nodes(Tri *tris, BoundingNode *nodes, int n, int bn) {
+__global__ void populate_bvh(Tri *t, BoundingNode *nodes, int n, int bn, int lower, int upper) {
   int i = threadIdx.x + blockIdx.x * blockDim.x;
-
-  if (i >= bn) return;
-
-  if (bn - i <= n) {
-    nodes[i].slab = bounding_slab(tris[bn - i - 1]);
-    nodes[i].t = (tris + bn - i - 1);
-    nodes[i].left = NULL;
-    nodes[i].right = NULL;
-    return;
-  }
+  
+  if (i < lower || i >= upper) return;
 
   int left = 2 * i + 1;
   int right = 2 * i + 2;
 
   if (left < bn && right < bn) {
+    nodes[i].left = &nodes[left];
+    nodes[i].right = &nodes[right];
+    nodes[i].slab = bounding_slab(nodes[left].slab, nodes[right].slab);
     nodes[i].t = NULL;
-    nodes[i].left = (nodes + left);
-    nodes[i].right = (nodes + right);
   } else if (left < bn) {
-    nodes[i].t = NULL;
-    nodes[i].left = (nodes + left);
+    nodes[i].left = &nodes[left];
     nodes[i].right = NULL;
-  } else if (right < bn) {
+    nodes[i].slab = nodes[left].slab;
     nodes[i].t = NULL;
+  } else if (right < bn) {
     nodes[i].left = NULL;
-    nodes[i].right = (nodes + right);
-  }
-}
-
-__global__ void compute_aabbs(BoundingNode *nodes, int lower, int upper) {
-  int i = threadIdx.x + blockIdx.x * blockDim.x;
-  
-  if (i < lower || i >= upper) return;
-
-  if (nodes[i].left == NULL && nodes[i].right == NULL) return;
-  else if (nodes[i].left == NULL) {
-    nodes[i].slab = nodes[i].right->slab;
-  } else if (nodes[i].right == NULL) {
-    nodes[i].slab = nodes[i].left->slab;
+    nodes[i].right = &nodes[right];
+    nodes[i].slab = nodes[right].slab;
+    nodes[i].t = NULL;
   } else {
-    nodes[i].slab = bounding_slab(nodes[i].left->slab, nodes[i].right->slab);
+    nodes[i].left = NULL;
+    nodes[i].right = NULL;
+    nodes[i].slab = bounding_slab(t[i - n]);
+    nodes[i].t = &t[i - n];
   }
 }
 
@@ -106,25 +91,25 @@ void render(float *host_out, const RenderParams &p, World w)
   cudaMalloc((void **)&device_out, imgsize * sizeof(float));
 
   Tri *device_tris;
-  cudaMalloc((void **)&device_tris, w.n * sizeof(Tri));
+  cudaMallocManaged((void **)&device_tris, w.n * sizeof(Tri));
   cudaMemcpy(device_tris, w.t, w.n * sizeof(Tri), cudaMemcpyHostToDevice);
   w.t = device_tris;
 
   BoundingNode *device_nodes;
-  cudaMalloc((void **)&device_nodes, 2 * w.n * sizeof(BoundingNode));
+  cudaMallocManaged((void **)&device_nodes, 2 * w.n * sizeof(BoundingNode));
 
   int tx = 8;
   int ty = 8;
-  
-  populate_nodes<<<2 * w.n / tx + 1, tx>>>(device_tris, device_nodes, w.n, 2 * w.n);
 
-  int acc = w.n;
+  cudaDeviceSynchronize();
+
+  int acc = 2 * w.n;
   while (acc > 0) {
-    compute_aabbs<<<acc / 2 / tx + 1, tx>>>(device_nodes, acc / 2, acc);
+    populate_bvh<<<acc / tx + 1, tx>>>(device_tris, device_nodes, w.n, 2 * w.n, acc / 2, acc);
 
     acc /= 2;
+    cudaDeviceSynchronize();
   }
-  cudaDeviceSynchronize();
 
   BVHWorld bw = {w.n, 2 * w.n, device_nodes};
 
@@ -135,7 +120,7 @@ void render(float *host_out, const RenderParams &p, World w)
   cudaMalloc((void **)&rand_state, imgsize * sizeof(curandState));
 
   rand_init<<<blocks, threads>>>(p, rand_state);
-  render_kernel<<<blocks, threads>>>(device_out, w, p, rand_state);
+  render_kernel<<<blocks, threads>>>(device_out, bw, p, rand_state);
 
   cudaDeviceSynchronize();
 
