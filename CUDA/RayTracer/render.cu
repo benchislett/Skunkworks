@@ -113,9 +113,48 @@ void populate_bvh_cpu(Tri *t, BoundingNode *nodes, int n, int bn) {
   }
 }
 
+__host__ __device__ inline uint64_t split3(uint32_t a) {
+  uint64_t x = a & 0x1fffff;
+  x = (x | x << 32) & 0x1f00000000ffff;
+  x = (x | x << 16) & 0x1f0000ff0000ff;
+  x = (x | x << 8)  & 0x100f00f00f00f00f;
+  x = (x | x << 4)  & 0x10c30c30c30c30c3;
+  x = (x | x << 2)  & 0x1249249249249249;
+  return x;
+}
+
+__host__ __device__ uint64_t mortonCode(const Tri &t, const AABB &bounds, int res) {
+  float x,y,z;
+  x = (t.a.x + t.b.x + t.c.x) / 3.0;
+  y = (t.a.y + t.b.y + t.c.y) / 3.0;
+  z = (t.a.z + t.b.z + t.c.z) / 3.0;
+  float xlen,ylen,zlen;
+  xlen = bounds.ur.x - bounds.ll.x;
+  ylen = bounds.ur.y - bounds.ll.y;
+  zlen = bounds.ur.z - bounds.ll.z;
+  uint32_t a = res * ((x - bounds.ll.x) / xlen);
+  uint32_t b = res * ((y - bounds.ll.y) / ylen);
+  uint32_t c = res * ((z - bounds.ll.z) / zlen);
+
+  uint64_t code = 0;
+  code |= split3(a) | (split3(b) << 1) | (split3(c) << 2);
+
+  return code;
+}
+
+__global__ void compute_morton_codes(Tri *t, uint64_t *codes, int n, AABB bounds, int res) {
+  int i = threadIdx.x + blockIdx.x * blockDim.x;
+
+  if (i >= n) return;
+
+  codes[i] = mortonCode(t[i], bounds, res);
+}
+
 void render(float *host_out, const RenderParams &p, World w)
 {
   int imgsize = 3 * p.width * p.height;
+  int tx = 16;
+  int ty = 16;
 
   float *device_out;
   cudaMalloc((void **)&device_out, imgsize * sizeof(float));
@@ -123,13 +162,15 @@ void render(float *host_out, const RenderParams &p, World w)
   Tri *device_tris;
   cudaMallocManaged((void **)&device_tris, w.n * sizeof(Tri));
   cudaMemcpy(device_tris, w.t, w.n * sizeof(Tri), cudaMemcpyHostToDevice);
-  w.t = device_tris;
+
+  uint64_t *morton_codes;
+  cudaMallocManaged((void **)&morton_codes, w.n * sizeof(uint64_t));
+  compute_morton_codes<<<w.n / tx + 1, tx>>>(device_tris, morton_codes, w.n, w.bounds, 2097151);
+
+  thrust::sort_by_key(thrust::device, morton_codes, morton_codes + w.n, device_tris);
 
   BoundingNode *device_nodes;
   cudaMallocManaged((void **)&device_nodes, 2 * w.n * sizeof(BoundingNode));
-
-  int tx = 16;
-  int ty = 16;
 
   cudaDeviceSynchronize();
 

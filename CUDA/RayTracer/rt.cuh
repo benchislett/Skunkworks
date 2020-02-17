@@ -4,15 +4,19 @@
 // MISC
 
 #include <string>
-#include<vector>
+#include <vector>
 #include <iostream>
 
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
 #include <float.h>
+
 #include <cuda_runtime.h>
 #include <curand_kernel.h>
+
+#include <thrust/sort.h>
+#include <thrust/execution_policy.h>
 
 #define TEST_EPSILON 0.00001
 #define EPSILON FLT_MIN
@@ -64,7 +68,7 @@ __host__ __device__ Vec3 ray_at(const Ray &r, float t);
 
 // TRIANGLE SURFACE
 
-typedef struct {
+typedef struct Tri_s {
   Vec3 a;
   Vec3 b;
   Vec3 c;
@@ -98,6 +102,7 @@ typedef struct bn {
 typedef struct {
   int n;
   Tri *t;
+  AABB bounds;
 } World;
 
 typedef struct {
