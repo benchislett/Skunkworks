@@ -4,7 +4,9 @@
 // MISC
 
 #include <string>
+#include<vector>
 #include <iostream>
+
 #include <stdio.h>
 #include <stdint.h>
 #include <math.h>
@@ -66,6 +68,9 @@ typedef struct {
   Vec3 a;
   Vec3 b;
   Vec3 c;
+  Vec3 n_a;
+  Vec3 n_b;
+  Vec3 n_c;
 } Tri;
 
 

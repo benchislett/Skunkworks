@@ -1,5 +1,5 @@
 #include "rt.cuh"
-
+// MOLLER-TRUMBORE
 __host__ __device__ bool hit(const Ray &r, const Tri &t, HitData *h)
 {
   Vec3 vertex1 = t.a;
@@ -32,8 +32,9 @@ __host__ __device__ bool hit(const Ray &r, const Tri &t, HitData *h)
 
   h->point = ray_at(r, time);
   h->time = time;
-  
-  Vec3 normal = unit(cross(edge1, edge2));
+ 
+  float w = 1 - u - v;
+  Vec3 normal = t.n_a * w + t.n_b * u + t.n_c * v;
 
   h->normal = normal * (-SIGN(dot(r.d, normal)));
 
