@@ -52,104 +52,6 @@ __global__ void render_kernel(float *out, const BVHWorld w, const RenderParams p
   out[idx + 2] = color.z;
 }
 
-__global__ void populate_bvh(Tri *t, BoundingNode *nodes, int n, int bn, int lower, int upper) {
-  int i = threadIdx.x + blockIdx.x * blockDim.x;
-  
-  if (i < lower || i >= upper) return;
-
-  int left = 2 * i + 1;
-  int right = 2 * i + 2;
-
-  if (left < bn && right < bn) {
-    nodes[i].left = &nodes[left];
-    nodes[i].right = &nodes[right];
-    nodes[i].slab = bounding_slab(nodes[left].slab, nodes[right].slab);
-    nodes[i].t = NULL;
-  } else if (left < bn) {
-    nodes[i].left = &nodes[left];
-    nodes[i].right = NULL;
-    nodes[i].slab = nodes[left].slab;
-    nodes[i].t = NULL;
-  } else if (right < bn) {
-    nodes[i].left = NULL;
-    nodes[i].right = &nodes[right];
-    nodes[i].slab = nodes[right].slab;
-    nodes[i].t = NULL;
-  } else {
-    nodes[i].left = NULL;
-    nodes[i].right = NULL;
-    nodes[i].slab = bounding_slab(t[i - n]);
-    nodes[i].t = &t[i - n];
-  }
-}
-
-void populate_bvh_cpu(Tri *t, BoundingNode *nodes, int n, int bn) {
-  int left, right;
-  for (int i = bn - 1; i >= 0; i--) {
-    left = 2 * i + 1;
-    right = 2 * i + 2;
-
-    if (left < bn && right < bn) {
-      nodes[i].left = &nodes[left];
-      nodes[i].right = &nodes[right];
-      nodes[i].slab = bounding_slab(nodes[left].slab, nodes[right].slab);
-      nodes[i].t = NULL;
-    } else if (left < bn) {
-      nodes[i].left = &nodes[left];
-      nodes[i].right = NULL;
-      nodes[i].slab = nodes[left].slab;
-      nodes[i].t = NULL;
-    } else if (right < bn) {
-      nodes[i].left = NULL;
-      nodes[i].right = &nodes[right];
-      nodes[i].slab = nodes[right].slab;
-      nodes[i].t = NULL;
-    } else {
-      nodes[i].left = NULL;
-      nodes[i].right = NULL;
-      nodes[i].slab = bounding_slab(t[i - n]);
-      nodes[i].t = &t[i - n];
-    }
-  }
-}
-
-__host__ __device__ inline uint64_t split3(uint32_t a) {
-  uint64_t x = a & 0x1fffff;
-  x = (x | x << 32) & 0x1f00000000ffff;
-  x = (x | x << 16) & 0x1f0000ff0000ff;
-  x = (x | x << 8)  & 0x100f00f00f00f00f;
-  x = (x | x << 4)  & 0x10c30c30c30c30c3;
-  x = (x | x << 2)  & 0x1249249249249249;
-  return x;
-}
-
-__host__ __device__ uint64_t mortonCode(const Tri &t, const AABB &bounds, int res) {
-  float x,y,z;
-  x = (t.a.x + t.b.x + t.c.x) / 3.0;
-  y = (t.a.y + t.b.y + t.c.y) / 3.0;
-  z = (t.a.z + t.b.z + t.c.z) / 3.0;
-  float xlen,ylen,zlen;
-  xlen = bounds.ur.x - bounds.ll.x;
-  ylen = bounds.ur.y - bounds.ll.y;
-  zlen = bounds.ur.z - bounds.ll.z;
-  uint32_t a = res * ((x - bounds.ll.x) / xlen);
-  uint32_t b = res * ((y - bounds.ll.y) / ylen);
-  uint32_t c = res * ((z - bounds.ll.z) / zlen);
-
-  uint64_t code = 0;
-  code |= split3(a) | (split3(b) << 1) | (split3(c) << 2);
-
-  return code;
-}
-
-__global__ void compute_morton_codes(Tri *t, uint64_t *codes, int n, AABB bounds, int res) {
-  int i = threadIdx.x + blockIdx.x * blockDim.x;
-
-  if (i >= n) return;
-
-  codes[i] = mortonCode(t[i], bounds, res);
-}
-
 void render(float *host_out, const RenderParams &p, World w)
 {
   int imgsize = 3 * p.width * p.height;
@@ -165,7 +67,7 @@ void render(float *host_out, const RenderParams &p, World w)
 
   uint64_t *morton_codes;
   cudaMallocManaged((void **)&morton_codes, w.n * sizeof(uint64_t));
-  compute_morton_codes<<<w.n / tx + 1, tx>>>(device_tris, morton_codes, w.n, w.bounds, 2097151);
+  populate_morton_codes<<<w.n / tx + 1, tx>>>(device_tris, morton_codes, w.n, w.bounds, 2097151);
 
   thrust::sort_by_key(thrust::device, morton_codes, morton_codes + w.n, device_tris);
 

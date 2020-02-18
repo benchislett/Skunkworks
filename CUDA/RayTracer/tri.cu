@@ -2,12 +2,8 @@
 // MOLLER-TRUMBORE
 __host__ __device__ bool hit(const Ray &r, const Tri &t, HitData *h)
 {
-  Vec3 vertex1 = t.a;
-  Vec3 vertex2 = t.b;
-  Vec3 vertex3 = t.c;
-
-  Vec3 edge1 = vertex2 - vertex1;
-  Vec3 edge2 = vertex3 - vertex1;
+  Vec3 edge1 = t.b - t.a;
+  Vec3 edge2 = t.c - t.a;
 
   Vec3 h_ = cross(r.d, edge2);
 
@@ -16,7 +12,7 @@ __host__ __device__ bool hit(const Ray &r, const Tri &t, HitData *h)
   if (ISZERO(a)) return false;
 
   float f = 1.0 / a;
-  Vec3 s = r.from - vertex1;
+  Vec3 s = r.from - t.a;
   float u = f * dot(s, h_);
 
   if (u < 0.0 || u > 1.0) return false;
@@ -28,7 +24,7 @@ __host__ __device__ bool hit(const Ray &r, const Tri &t, HitData *h)
 
   float time = f * dot(edge2, q);
 
-  if (time < 0.01) return false;
+  if (time < 0.0001) return false;
 
   h->point = ray_at(r, time);
   h->time = time;

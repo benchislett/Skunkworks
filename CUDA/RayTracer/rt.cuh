@@ -97,6 +97,9 @@ typedef struct bn {
   struct bn *right;
 } BoundingNode;
 
+__global__ void populate_bvh(Tri *t, BoundingNode *nodes, int n, int bn, int lower, int upper);
+__global__ void populate_morton_codes(Tri *t, uint64_t *codes, int n, AABB bounds, int res);
+
 // INTERSECTION LOGIC
 
 typedef struct {

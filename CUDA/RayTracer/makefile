@@ -23,7 +23,7 @@ libbenrt.a: $(OBJECTS) device.o
 	$(AR) $(ARFLAGS) $@ $^
 
 %.o: %.cu
-	$(NVCC) -c $^ -o $@ $(CUDAFLAGS) -dc
+	$(NVCC) -c $^ -o $@ $(CUDAFLAGS) -dc -pg
 
 .PHONY: clean
 clean:
