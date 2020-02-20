@@ -2,13 +2,13 @@
 
 __device__ Vec3 random_in_unit_sphere(curandState *r)
 {
-  Vec3 p;
-  Vec3 white = {1.0, 1.0, 1.0};
+  float x,y,z;
   do {
-    p = (Vec3){curand_uniform(r), curand_uniform(r), curand_uniform(r)} * 2.0;
-    p = p - white;
-  } while (norm_sq(p) >= 1.0);
-  return p;
+    x = 2.0 * curand_uniform(r) - 1.0;
+    y = 2.0 * curand_uniform(r) - 1.0;
+    z = 2.0 * curand_uniform(r) - 1.0;
+  } while (x*x + y*y + z*z >= 1.0);
+  return {x, y, z};
 }
 
 __global__ void rand_init(const RenderParams p, curandState *rand_state) {

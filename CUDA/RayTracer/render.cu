@@ -1,24 +1,32 @@
 #include "rt.cuh"
-#define MAX_DEPTH 1
+#define MAX_DEPTH 16
+
+inline __device__ Vec3 lerp(const Vec3 &a, const Vec3 &b, float factor) {
+  return a * (1 - factor) + b * factor;
+}
 
 __device__ Vec3 get_color(const Ray &r, const BVHWorld &w, const RenderParams &p, curandState *rand_state)
 {
   Vec3 color = {1.0, 1.0, 1.0};
   const Vec3 white = {1.0, 1.0, 1.0};
-  Vec3 tri_color = {0.9, 0.5, 0.7};
-  HitData rec = {-1.0, white, white};
+  HitData rec;
   Ray ray = r;
-  int depth = 1;
+  int depth = 0;
+
+  Vec3 attenuation = {0.75, 0.75, 0.75};
 
   while (hit(ray, w, &rec)) {
     ray.from = rec.point;
-    ray.d = rec.normal;
-    color = color * tri_color;
-    if (depth++ >= MAX_DEPTH) break;
+    ray.d = rec.normal + random_in_unit_sphere(rand_state);
+    color = color * attenuation;
+    if (depth++ >= MAX_DEPTH) {
+      color = {0.0, 0.0, 0.0};
+      break;
+    }
   }
 
   float t = 0.5 * (unit(ray.d).y + 1);
-  color = color * ((white * (1.0-t)) + (p.background * t));
+  color = color * lerp(white, p.background, t);
 
   return color;
 }
@@ -101,4 +109,5 @@ void render(float *host_out, const RenderParams &p, World w)
 
   cudaFree(device_out);
   cudaFree(device_tris);
+  cudaFree(morton_codes);
 }

@@ -1,8 +1,8 @@
 #include "rt.cuh"
 
-#define WIDTH 512
-#define HEIGHT 512
-#define SAMPLES 16
+#define WIDTH 4096
+#define HEIGHT 4096
+#define SAMPLES 256
 
 World loadOFF(const char *path)
 {
