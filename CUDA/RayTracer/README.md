@@ -10,4 +10,3 @@ This project is written and built with separable compilation in mind. Not only c
 
 As the project gets more mature, I will be populating the output folder with sample renders for your viewing pleasure.
 
-![4k Stanford Dragon, 256 samples, 90 minutes](./output/dragon.png)
