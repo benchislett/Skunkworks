@@ -29,7 +29,6 @@ On that same note, any project requiring CI/CD or collaboration from peers shoul
   - [OIST Skill-Pill Notes](Julia/Skill-Pill/)
   - [OIST Scientific Computing in Julia Workshop](Julia/Workshop/)
   - [Julia Set Renderer](Julia/Fractal-Render/) (`CSFML.jl`)
-  - [Render Engine](Julia/Graphics/)
 - Python
   - [Split-Step Fourier Method NLSE solver](Python3/Split-Operator-Solver/)
   - [Video to Ascii converter](Python3/video2ascii/) (`curses`)
