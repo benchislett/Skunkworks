@@ -14,10 +14,8 @@ This many projects can really clutter a github page, and make it difficult to di
 Here, I can maintain an overview of my past minor projects, and dedicate an entire repository to major projects under active development/maintenance.
 
 Further, I do not have to deal with the major turnoffs for monorepos:
-There's no issue of scalability, because any huge project can be split off into its own repo.
+There's no issue of scalability, because any large project can be split off into its own repo.
 On that same note, any project requiring CI/CD or collaboration from peers should also be its own repo.
-
-At the end of the day, this choice was made because it provides more benefits than drawbacks _for this use case_.
 
 ## Projects
 
