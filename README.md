@@ -15,7 +15,6 @@ These are intended to be short-term exercises for learning purposes, and scalabi
   - [Conway's Game of Life implementation](C++/Game-of-Life/) (`SFML`)
   - [NES Tetris](C++/Tetris/) (`SFML`)
 - Julia
-  - [OIST Skill-Pill Notes](Julia/Skill-Pill/)
   - [Arbitrary Precision Arithmetic on the GPU](Julia/BigIntGPU/) (`CUDAnative`)
   - [Julia Set Renderer](Julia/Fractal-Render/) (`CSFML.jl`)
 - Python
