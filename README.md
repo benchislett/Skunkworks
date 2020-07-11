@@ -2,20 +2,9 @@
 
 ## What is this?
 
-This repository contains a collection of small side-projects I have written.
-These mini-projects are curated and maintained by myself, but not all are under active development.
-None of these are meant to be long-term commitments, but rather small exercises to keep my skills sharp and/or learn a new language, framework, algorithm or technique, or just to solve a problem.
-
-## Why only one repository?
-
-The mono-repository structure allows for projects to be collected in one place, so they can be much more easily mantained over time.
-
-This many projects can really clutter a github page, and make it difficult to discern major from minor projects.
-Here, I can maintain an overview of my past minor projects, and dedicate an entire repository to major projects under active development/maintenance.
-
-Further, I do not have to deal with the major turnoffs for monorepos:
-There's no issue of scalability, because any large project can be split off into its own repo.
-On that same note, any project requiring CI/CD or collaboration from peers should also be its own repo.
+This repository contains a collection of small side-projects I have worked on.
+These mini-projects are curated and maintained by myself, though few are under active development.
+These are intended to be short-term exercises for learning purposes, and scalability is rarely a concern.
 
 ## Projects
 
