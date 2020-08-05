@@ -33,3 +33,6 @@ solitaire
 data/
 *.ppm
 
+# JS/TS
+node_modules/
+build/
