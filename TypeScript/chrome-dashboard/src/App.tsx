@@ -1,12 +1,12 @@
 import React from 'react';
 import './App.css';
 
+import { Background } from './Background/Background';
+
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-      <h1>Work In Progress</h1>
-      </header>
+        <Background />
     </div>
   );
 }
