@@ -6,7 +6,7 @@ function Background() {
   const [image, setImage] = React.useState(null);
 
   React.useEffect(() => {
-    fetch('https://source.unsplash.com/1920x1080/?Wallpaper')
+    fetch('https://source.unsplash.com/1920x1080/')
       .then((response) => {
         if (!response.ok) {
           throw Error('Error fetching image!');
@@ -24,7 +24,7 @@ function Background() {
   } else {
     console.log(image);
     return (
-      <div style={{ height: '100%' }}>
+      <div className='background-container'>
         <div
           className='background-image'
           style={{ backgroundImage: `url(${image})` }}
