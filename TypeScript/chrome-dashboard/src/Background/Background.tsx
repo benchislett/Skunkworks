@@ -2,11 +2,15 @@ import React from 'react';
 
 import './Background.css';
 
-function Background() {
+interface BackgroundProps {
+  children: React.ReactNode;
+}
+
+function Background({ children }: BackgroundProps) {
   const [image, setImage] = React.useState(null);
 
   React.useEffect(() => {
-    fetch('https://source.unsplash.com/1920x1080/')
+    fetch('https://source.unsplash.com/1920x1080/?Landscape')
       .then((response) => {
         if (!response.ok) {
           throw Error('Error fetching image!');
@@ -28,7 +32,9 @@ function Background() {
         <div
           className='background-image'
           style={{ backgroundImage: `url(${image})` }}
-        />
+        >
+          {children}
+        </div>
       </div>
     );
   }
