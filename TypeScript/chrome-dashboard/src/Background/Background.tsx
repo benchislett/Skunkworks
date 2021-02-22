@@ -23,21 +23,18 @@ function Background({ children }: BackgroundProps) {
       });
   }, []);
 
-  if (image == null) {
-    return <div></div>;
-  } else {
-    console.log(image);
-    return (
-      <div className='background-container'>
-        <div
-          className='background-image'
-          style={{ backgroundImage: `url(${image})` }}
-        >
-          {children}
-        </div>
+  return (
+    <div className='background-container'>
+      <div
+        className='background-image'
+        style={{
+          background: image ? `url(${image})` : 'white'
+        }}
+      >
+        {children}
       </div>
-    );
-  }
+    </div>
+  );
 }
 
 export { Background };
