@@ -53,7 +53,7 @@ def summary(x):
         tf.summary.histogram('histogram', x)
 
 # <-- Color Space Conversion --> #
-# - Disclaimder: Shamelessly stolen from stack overflow - #
+# - Disclaimer: Shamelessly stolen from stack overflow - #
 
 
 def YCC2RGB(x):
