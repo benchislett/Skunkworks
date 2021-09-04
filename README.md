@@ -16,6 +16,8 @@
 ## [NES Tetris](C++/Tetris/)
 ![NES Tetris Sample](C++/Tetris/output/output.png)
 
+## [Cards and Shuffle simulations](C++/ShuffleSim/)
+
 # Julia
 
 ## [Arbitrary Precision Arithmetic on the GPU](Julia/BigIntGPU/)
