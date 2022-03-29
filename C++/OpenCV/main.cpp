@@ -1,69 +1,124 @@
-
-#include <chrono>
+#include <cstring>
 #include <iostream>
-#include <opencv2/core.hpp>
-#include <opencv2/cvconfig.h>
+#include <opencv2/calib3d.hpp>
+#include <opencv2/core/persistence.hpp>
+#include <opencv2/core/utility.hpp>
 #include <opencv2/highgui.hpp>
-#include <opencv2/imgproc.hpp>
+#include <opencv2/tracking.hpp>
 #include <opencv2/videoio.hpp>
-#include <stdio.h>
 
-using Clock = std::chrono::steady_clock;
-using std::chrono::duration_cast;
-using std::chrono::milliseconds;
-using std::chrono::time_point;
-using namespace std::literals::chrono_literals;
+const std::string window = "RoboSoccer";
 
-using namespace cv;
-using namespace std;
+int main(int argc, char** argv) {
+  std::string video = "/dev/video2";
+  cv::VideoCapture cap(video);
+  cv::Mat frame;
 
-void thresh_callback(int, void*);
+  double width  = (double) cap.get(cv::CAP_PROP_FRAME_WIDTH);
+  double height = (double) cap.get(cv::CAP_PROP_FRAME_HEIGHT);
 
-RNG rng(12345);
+  cv::Mat background;
+  cv::Mat homography;
 
-Mat img, gray, edges, output;
+  std::vector<cv::Point2d> corner_points = {{0, 0}, {0, height}, {width, height}, {width, 0}};
+  std::vector<cv::Point2d> homography_points;
 
-int low  = 0;
-int high = 255;
+  printf("Press SPACE to capture the background. Press 'g' to use precomputed data.\n");
+  while (background.empty()) {
+    cap >> frame;
+    imshow(window, frame);
 
-int main(int, char**) {
-  img = imread("../im.jpg");
-  cvtColor(img, gray, COLOR_BGR2GRAY);
-  blur(gray, gray, Size(3, 3));
-
-  namedWindow("opencv");
-  createTrackbar("Canny low:", "opencv", &low, 512, thresh_callback);
-  createTrackbar("Canny high:", "opencv", &high, 512, thresh_callback);
-  thresh_callback(0, 0);
-
-  while (waitKey() != 'q')
-    ;
-}
-
-
-void thresh_callback(int, void*) {
-  Canny(gray, edges, low, high);
-
-  vector<vector<Point>> contours;
-  vector<Vec4i> hierarchy;
-  findContours(edges, contours, hierarchy, RETR_TREE, CHAIN_APPROX_SIMPLE);
-
-  Mat output = Mat::zeros(edges.size(), CV_8UC3);
-  for (size_t i = 0; i < contours.size(); i++) {
-    Scalar color = Scalar(rng.uniform(0, 256), rng.uniform(0, 256), rng.uniform(0, 256));
-    drawContours(output, contours, (int) i, color, 2, LINE_8, hierarchy, 0);
+    int key = cv::waitKey(1);
+    if (key == ' ') {
+      cv::FileStorage file("config.json", cv::FileStorage::FORMAT_JSON | cv::FileStorage::WRITE);
+      cap >> background;
+      file.write("background", background);
+    } else if (key == 'g') {
+      cv::FileStorage file("config.json", cv::FileStorage::FORMAT_JSON | cv::FileStorage::READ);
+      file["background"] >> background;
+      file["homography"] >> homography;
+    }
   }
 
-  // imshow("opencv", img);
-  // while (pollKey() != 'n')
-  //   ;
-  // imshow("opencv", gray);
-  // while (pollKey() != 'n')
-  //   ;
-  imshow("opencv", edges);
-  // while (pollKey() != 'n')
-  //   ;
-  // imshow("opencv", output);
-  // while (pollKey() != 'n')
-  //   ;
+  cv::Rect roi;
+  while (homography.empty() && homography_points.size() < 4) {
+    cap >> frame;
+    for (auto p : homography_points)
+      cv::circle(frame, p, 8, {0, 255, 0}, cv::FILLED);
+    imshow(window, frame);
+
+    roi = cv::selectROI(window, frame);
+
+    homography_points.emplace_back(roi.x + (roi.width / 2.0), roi.y + (roi.height / 2.0));
+    printf("Corner identified at: (%f, %f)\n", homography_points.back().x, homography_points.back().y);
+  }
+
+  if (homography.empty()) {
+    cv::FileStorage file("config.json", cv::FileStorage::FORMAT_JSON | cv::FileStorage::APPEND);
+    homography = cv::findHomography(homography_points, corner_points);
+    file.write("homography", homography);
+  }
+
+  cv::Mat transformed_frame;
+  printf("Displaying homography. Press SPACE to continue.\n");
+  while (cv::waitKey(1) != ' ') {
+    cap >> frame;
+    cv::warpPerspective(frame, transformed_frame, homography, frame.size());
+    imshow(window, transformed_frame);
+  }
+
+  printf("Displaying background-subtracted homography. Press SPACE to continue.\n");
+  while (cv::waitKey(1) != ' ') {
+    cap >> frame;
+    frame -= background;
+    cv::warpPerspective(frame, transformed_frame, homography, frame.size());
+
+    imshow(window, transformed_frame);
+  }
+
+  cv::Ptr<cv::Tracker> self_tracker = cv::TrackerCSRT::create();
+  cv::Ptr<cv::Tracker> opp_tracker  = cv::TrackerCSRT::create();
+  cv::Ptr<cv::Tracker> ball_tracker = cv::TrackerCSRT::create();
+
+  printf("Identify self: ");
+  cap >> frame;
+  frame -= background;
+  cv::warpPerspective(frame, transformed_frame, homography, frame.size());
+  roi = selectROI(window, transformed_frame);
+  self_tracker->init(transformed_frame, roi);
+  printf("done!\n");
+
+  printf("Identify opponent: ");
+  cap >> frame;
+  frame -= background;
+  cv::warpPerspective(frame, transformed_frame, homography, frame.size());
+  roi = selectROI(window, transformed_frame);
+  opp_tracker->init(transformed_frame, roi);
+  printf("done!\n");
+
+  printf("Identify ball: ");
+  cap >> frame;
+  frame -= background;
+  cv::warpPerspective(frame, transformed_frame, homography, frame.size());
+  roi = selectROI(window, transformed_frame);
+  ball_tracker->init(transformed_frame, roi);
+  printf("done!\n");
+
+  printf("Start the tracking process, press ESC to quit.\n");
+  while (cv::waitKey(1) != 27) {
+    cap >> frame;
+    frame -= background;
+    cv::warpPerspective(frame, transformed_frame, homography, frame.size());
+    transformed_frame.copyTo(frame);
+    self_tracker->update(transformed_frame, roi);
+    rectangle(frame, roi, {255, 0, 0}, 2, 1);
+    opp_tracker->update(transformed_frame, roi);
+    rectangle(frame, roi, {0, 255, 0}, 2, 1);
+    ball_tracker->update(transformed_frame, roi);
+    rectangle(frame, roi, {0, 0, 255}, 2, 1);
+
+    imshow(window, frame);
+  }
+
+  return 0;
 }
